@@ -193,4 +193,11 @@ Host := [].{
 	sleep_millis! : U64 => {}
 
 	unix_time_now! : () => I128
+
+	crypt_sha1! : List(U8) => Str
+	crypt_encrypt_aes256_gcm! : List(U8), List(U8), List(U8) => Try({ auth_tag : List(U8), ciphertext : List(U8) }, [CryptoErr(Str)])
+	crypt_decrypt_aes256_gcm! : List(U8), List(U8), List(U8), List(U8) => Try(List(U8), [CryptoErr(Str)])
+
+	random_seed_u32! : () => Try(U32, [RandomErr(IOErr)])
+	random_seed_u64! : () => Try(U64, [RandomErr(IOErr)])
 }

@@ -120,6 +120,21 @@ pub(crate) type TcpHostWriteResult = HostTcpWriteResult;
 pub(crate) type TcpHostWriteResultPayload = HostTcpWriteResultPayload;
 pub(crate) type TcpHostWriteResultTag = HostTcpWriteResultTag;
 
+pub(crate) type CryptBytesResult = HostCryptDecryptAes256GcmResult;
+pub(crate) type CryptBytesResultPayload = HostCryptDecryptAes256GcmResultPayload;
+pub(crate) type CryptBytesResultTag = HostCryptDecryptAes256GcmResultTag;
+pub(crate) type CryptEncryptedResult = HostCryptEncryptAes256GcmResult;
+pub(crate) type CryptEncryptedResultPayload = HostCryptEncryptAes256GcmResultPayload;
+pub(crate) type CryptEncryptedResultTag = HostCryptEncryptAes256GcmResultTag;
+pub(crate) type CryptEncryptedValue = AnonStruct7888c40338892024;
+
+pub(crate) type RandomSeedU32Result = HostRandomSeedU32Result;
+pub(crate) type RandomSeedU32ResultPayload = HostRandomSeedU32ResultPayload;
+pub(crate) type RandomSeedU32ResultTag = HostRandomSeedU32ResultTag;
+pub(crate) type RandomSeedU64Result = HostRandomSeedU64Result;
+pub(crate) type RandomSeedU64ResultPayload = HostRandomSeedU64ResultPayload;
+pub(crate) type RandomSeedU64ResultTag = HostRandomSeedU64ResultTag;
+
 pub(crate) type HostIOErrType = IOErr;
 pub(crate) type HostIOErrPayloadType = IOErrPayload;
 pub(crate) type HostIOErrTagType = IOErrTag;

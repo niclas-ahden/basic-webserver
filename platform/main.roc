@@ -17,6 +17,7 @@ platform "webserver"
 	exposes [
 		Attribute,
 		Cmd,
+		Crypt,
 		Env,
 		File,
 		Html,
@@ -25,6 +26,7 @@ platform "webserver"
 		MultipartFormData,
 		OsStr,
 		Path,
+		Random,
 		Server,
 		Sse,
 		Sleep,
@@ -113,6 +115,11 @@ platform "webserver"
 		"hosted_sleep_millis": Host.sleep_millis!,
 		"hosted_request_body_read": Host.request_body_read!,
 		"hosted_request_body_read_all": Host.request_body_read_all!,
+		"hosted_crypt_sha1": Host.crypt_sha1!,
+		"hosted_crypt_encrypt_aes256_gcm": Host.crypt_encrypt_aes256_gcm!,
+		"hosted_crypt_decrypt_aes256_gcm": Host.crypt_decrypt_aes256_gcm!,
+		"hosted_random_seed_u32": Host.random_seed_u32!,
+		"hosted_random_seed_u64": Host.random_seed_u64!,
 		"hosted_readiness_create": Host.readiness_create!,
 		"hosted_readiness_set": Host.readiness_set!,
 		"hosted_request_body_write_file": Host.request_body_write_file!,
@@ -127,9 +134,11 @@ platform "webserver"
 	}
 
 import Cmd
+import Crypt
 import Env
 import File
 import Host
+import Random
 import Attribute
 import Html
 import Http

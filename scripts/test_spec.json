@@ -1490,6 +1490,39 @@
       ]
     },
     {
+      "path": "examples/crypt.roc",
+      "mode": "server",
+      "cases": [
+        {
+          "name": "hashing-and-encryption",
+          "requests": [
+            {
+              "method": "POST",
+              "target": "/hash",
+              "body": "hello",
+              "expect_body": "SHA-1: aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d\nSHA-256: 2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+            },
+            {
+              "method": "POST",
+              "target": "/encrypt",
+              "body": "secret message",
+              "body_contains": ["decrypted: secret message", "tag bytes: 16"]
+            },
+            {
+              "method": "GET",
+              "target": "/token",
+              "body_regex": ["^token: [0-9a-f]{32}$"]
+            },
+            {
+              "method": "GET",
+              "target": "/seed",
+              "body_regex": ["^seed: [0-9]+$"]
+            }
+          ]
+        }
+      ]
+    },
+    {
       "path": "examples/env.roc",
       "mode": "server",
       "cases": [
