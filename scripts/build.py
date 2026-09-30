@@ -129,6 +129,11 @@ def musl_build_env(rust_target: str) -> dict[str, str]:
 
 
 def install_rust_target(rust_target: str, *, required: bool = False) -> None:
+    if shutil.which("rustup") is None:
+        # Toolchains provisioned without rustup (such as the Nix dev shell)
+        # must already ship the target's standard library; cargo reports a
+        # clear error if it is missing.
+        return
     run("rustup", "target", "add", rust_target, check=required)
 
 

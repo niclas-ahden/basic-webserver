@@ -51,6 +51,11 @@ script for the latest nightly, pushes the result to the `update-roc-nightly`
 branch, runs CI with that nightly, and opens a pull request reporting whether
 it passed.
 
+With Nix flakes enabled, `nix develop` provides all of the above, building the
+compiler from the commit of the pinned nightly. When you move `.roc-version`,
+point the `roc-src` url in [`flake.nix`](flake.nix) at the new commit and run
+`nix flake lock`. The shell refuses to start while the two disagree.
+
 ## Build and run locally
 
 Build the native host library:
