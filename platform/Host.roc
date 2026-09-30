@@ -139,6 +139,10 @@ Host := [].{
 	file_write_utf8! : RawPath, Str => Try({}, [FileErr(IOErr)])
 	file_open_reader! : RawPath, U64 => Try(FileReader, [FileErr(IOErr)])
 	file_read_line! : FileReader => Try(List(U8), [FileErr(IOErr)])
+	file_read_up_to! : FileReader, U64 => Try(List(U8), [FileErr(IOErr)])
+	file_read_exactly! : FileReader, U64 => Try(List(U8), [FileErr(IOErr), FileUnexpectedEOF])
+	file_reader_position! : FileReader => Try(U64, [FileErr(IOErr)])
+	file_reader_seek! : FileReader, [Start(U64), Current(I64), End(I64)] => Try(U64, [FileErr(IOErr)])
 	file_delete! : RawPath => Try({}, [FileErr(IOErr)])
 	file_hard_link! : RawPath, RawPath => Try({}, [FileErr(IOErr)])
 	file_rename! : RawPath, RawPath => Try({}, [FileErr(IOErr)])
@@ -149,6 +153,8 @@ Host := [].{
 	file_time_accessed! : RawPath => Try(I128, [FileErr(IOErr)])
 	file_time_modified! : RawPath => Try(I128, [FileErr(IOErr)])
 	file_time_created! : RawPath => Try(I128, [FileErr(IOErr)])
+	file_write_bytes_at! : RawPath, U64, List(U8) => Try({}, [FileErr(IOErr)])
+	file_set_len! : RawPath, U64 => Try({}, [FileErr(IOErr)])
 
 	http_send_request! : InternalHttp.OutboundRequestToHost => Try(InternalHttp.OutboundResponseFromHost, InternalHttp.SendErr)
 

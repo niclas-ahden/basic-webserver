@@ -21,6 +21,7 @@ mod compression;
 mod dir;
 mod env;
 mod file;
+mod file_reader;
 mod file_server;
 mod host_resource;
 mod http;

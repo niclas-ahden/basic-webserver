@@ -120,6 +120,20 @@ Path := [
 	write_utf8! : Path, Str => Try({}, [PathErr(IOErr)])
 	write_utf8! = |path, content| map_file_result(Host.file_write_utf8!(to_host_raw!(path), content))
 
+	## Write bytes starting at byte `offset` into the existing file at this
+	## path (use [Path.set_len!] to create or grow it first). Writing past the
+	## end extends the file with a zero-filled gap. Concurrent writes to
+	## overlapping ranges are not ordered. To read at an offset, seek a
+	## [File.Reader].
+	write_bytes_at! : Path, U64, List(U8) => Try({}, [PathErr(IOErr)])
+	write_bytes_at! = |path, offset, bytes|
+		map_file_result(Host.file_write_bytes_at!(to_host_raw!(path), offset, bytes))
+
+	## Set the length of the file at this path, creating it if missing. Growing
+	## extends the file with zeroes, shrinking truncates it.
+	set_len! : Path, U64 => Try({}, [PathErr(IOErr)])
+	set_len! = |path, len| map_file_result(Host.file_set_len!(to_host_raw!(path), len))
+
 	## Delete a file at this path.
 	delete! : Path => Try({}, [PathErr(IOErr)])
 	delete! = |path| map_file_result(Host.file_delete!(to_host_raw!(path)))

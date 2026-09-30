@@ -1656,6 +1656,78 @@
       ]
     },
     {
+      "path": "examples/file-random-access.roc",
+      "mode": "server",
+      "cases": [
+        {
+          "name": "fixed-slot-records",
+          "env": {
+            "SLOT_FILE": "{temp}/slots.bin"
+          },
+          "requests": [
+            {
+              "method": "POST",
+              "target": "/slot/3",
+              "body": "hello slot",
+              "expect_body": "stored 10 bytes in slot 3"
+            },
+            {
+              "method": "GET",
+              "target": "/slot/3",
+              "expect_body": "slot 3: hello slot"
+            },
+            {
+              "method": "POST",
+              "target": "/slot/3",
+              "body": "replaced",
+              "expect_body": "stored 8 bytes in slot 3"
+            },
+            {
+              "method": "GET",
+              "target": "/slot/3",
+              "expect_body": "slot 3: replaced"
+            },
+            {
+              "method": "GET",
+              "target": "/slot/99",
+              "status": 404,
+              "expect_body": "Slot index must be below 16"
+            },
+            {
+              "method": "GET",
+              "target": "/slot/abc",
+              "status": 400,
+              "expect_body": "Slot index must be a decimal number"
+            },
+            {
+              "method": "GET",
+              "target": "/slot/99999999999999999999999",
+              "status": 400,
+              "expect_body": "Slot index must be a decimal number"
+            },
+            {
+              "method": "POST",
+              "target": "/slot/3",
+              "body": "0123456789012345678901234567890123456789012345678901234567890123456789",
+              "status": 413,
+              "expect_body": "A record holds at most 64 bytes"
+            },
+            {
+              "method": "GET",
+              "target": "/checksum",
+              "expect_body": "sha256: ca805b738b9c1b6262587ac4c8bb75b30c5bbbd010228462020be6fd9498d2a0"
+            },
+            {
+              "method": "GET",
+              "target": "/other",
+              "status": 404,
+              "expect_body": "URL Not Found (404)"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "path": "examples/form-file-upload.roc",
       "mode": "server",
       "cases": [

@@ -7,15 +7,18 @@ use std::sync::{Mutex, OnceLock};
 use crate::abi::{
     io_err_from_io, roc_host, FileBoolResult, FileBoolResultPayload, FileBoolResultTag,
     FileBytesResult, FileBytesResultPayload, FileBytesResultTag, FileDeleteResult,
-    FileDeleteResultPayload, FileDeleteResultTag, FileReaderLineResult,
-    FileReaderLineResultPayload, FileReaderLineResultTag, FileReaderOpenResult,
-    FileReaderOpenResultPayload, FileReaderOpenResultTag, FileSizeResult, FileSizeResultPayload,
+    FileDeleteResultPayload, FileDeleteResultTag, FileReadExactlyErr, FileReadExactlyErrPayload,
+    FileReadExactlyErrTag, FileReadExactlyResult, FileReadExactlyResultPayload,
+    FileReadExactlyResultTag, FileReaderLineResult, FileReaderLineResultPayload,
+    FileReaderLineResultTag, FileReaderOpenResult, FileReaderOpenResultPayload,
+    FileReaderOpenResultTag, FileSeekFrom, FileSeekFromTag, FileSizeResult, FileSizeResultPayload,
     FileSizeResultTag, FileStrResult, FileStrResultPayload, FileStrResultTag, FileTimeResult,
     FileTimeResultPayload, FileTimeResultTag, FileWriteBytesResult, FileWriteBytesResultPayload,
     FileWriteBytesResultTag, FileWriteUtf8Result, FileWriteUtf8ResultPayload,
     FileWriteUtf8ResultTag,
 };
 use crate::capability::{try_lock, CapabilityLockError};
+use crate::file_reader;
 use crate::host_resource::{
     DeallocRoute, HostResourceHeap, LookupError, ReserveError, ResourceReservation,
 };
@@ -404,45 +407,145 @@ pub extern "C" fn hosted_file_open_reader(
     }
 }
 
-#[no_mangle]
-pub extern "C" fn hosted_file_read_line(handle: *mut u64) -> FileReaderLineResult {
-    let roc_host = roc_host();
-    let result = {
-        match unsafe { file_reader_ref(handle) } {
-            Ok(reader) => match try_lock(reader) {
-                Ok(mut reader) => {
-                    let mut buffer = Vec::new();
-                    let read = reader
-                        .by_ref()
-                        .take(MAX_MATERIALIZED_FILE_BYTES + 1)
-                        .read_until(b'\n', &mut buffer);
-                    match read {
-                        Ok(_) if buffer.len() as u64 <= MAX_MATERIALIZED_FILE_BYTES => {
-                            try_file_reader_line_ok(unsafe {
-                                RocListWith::<u8, false>::from_slice(&buffer, roc_host)
-                            })
-                        }
-                        Ok(_) => {
-                            try_file_reader_line_err(file_materialization_limit_error(roc_host))
-                        }
-                        Err(error) => try_file_reader_line_err(io_err_from_io(&error, roc_host)),
-                    }
-                }
-                Err(CapabilityLockError::Busy) => try_file_reader_line_err(
-                    crate::abi::io_err_other("file reader is already in use", roc_host),
-                ),
-                Err(CapabilityLockError::Poisoned) => try_file_reader_line_err(
-                    crate::abi::io_err_other("file reader is unavailable", roc_host),
-                ),
-            },
-            Err(_) => try_file_reader_line_err(crate::abi::io_err_other(
-                "file reader handle is stale or invalid",
-                roc_host,
-            )),
-        }
+/// Run `operation` on the reader behind a hosted handle argument, then release
+/// the Roc reference that the argument transferred.
+fn with_file_reader<T>(
+    handle: *mut u64,
+    roc_host: &RocHost,
+    operation: impl FnOnce(&mut BufReader<fs::File>) -> io::Result<T>,
+) -> io::Result<T> {
+    let result = match unsafe { file_reader_ref(handle) } {
+        Ok(reader) => match try_lock(reader) {
+            Ok(mut reader) => operation(&mut reader),
+            Err(CapabilityLockError::Busy) => {
+                Err(io::Error::other("file reader is already in use"))
+            }
+            Err(CapabilityLockError::Poisoned) => {
+                Err(io::Error::other("file reader is unavailable"))
+            }
+        },
+        Err(_) => Err(io::Error::other("file reader handle is stale or invalid")),
     };
     release_file_reader(handle, roc_host);
     result
+}
+
+/// Binary reads materialize into Roc lists, so they share the whole-file
+/// materialization limit and fail before allocating past it.
+fn check_materialized_read(count: u64) -> io::Result<()> {
+    if count > MAX_MATERIALIZED_FILE_BYTES {
+        Err(io::Error::other(
+            "file read exceeded the 8 MiB materialization limit; read in smaller pieces",
+        ))
+    } else {
+        Ok(())
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn hosted_file_read_line(handle: *mut u64) -> FileReaderLineResult {
+    let roc_host = roc_host();
+    let result = with_file_reader(handle, roc_host, |reader| {
+        let mut buffer = Vec::new();
+        reader
+            .by_ref()
+            .take(MAX_MATERIALIZED_FILE_BYTES + 1)
+            .read_until(b'\n', &mut buffer)?;
+        Ok(buffer)
+    });
+    match result {
+        Ok(buffer) if buffer.len() as u64 <= MAX_MATERIALIZED_FILE_BYTES => {
+            try_file_reader_line_ok(unsafe {
+                RocListWith::<u8, false>::from_slice(&buffer, roc_host)
+            })
+        }
+        Ok(_) => try_file_reader_line_err(file_materialization_limit_error(roc_host)),
+        Err(error) => try_file_reader_line_err(io_err_from_io(&error, roc_host)),
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn hosted_file_read_up_to(handle: *mut u64, max_bytes: u64) -> FileBytesResult {
+    let roc_host = roc_host();
+    let result = with_file_reader(handle, roc_host, |reader| {
+        check_materialized_read(max_bytes)?;
+        file_reader::read_up_to(reader, max_bytes)
+    });
+    match result {
+        Ok(bytes) => try_file_bytes_ok(unsafe {
+            // SAFETY: the returned Roc list owns a copy of `bytes`.
+            RocListWith::<u8, false>::from_slice(&bytes, roc_host)
+        }),
+        Err(error) => try_file_bytes_err(io_err_from_io(&error, roc_host)),
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn hosted_file_read_exactly(handle: *mut u64, count: u64) -> FileReadExactlyResult {
+    let roc_host = roc_host();
+    let result = with_file_reader(handle, roc_host, |reader| {
+        check_materialized_read(count)?;
+        file_reader::read_exactly(reader, count)
+    });
+    match result {
+        Ok(bytes) => FileReadExactlyResult {
+            payload: FileReadExactlyResultPayload {
+                ok: ManuallyDrop::new(unsafe {
+                    // SAFETY: the returned Roc list owns a copy of `bytes`.
+                    RocListWith::<u8, false>::from_slice(&bytes, roc_host)
+                }),
+            },
+            tag: FileReadExactlyResultTag::Ok,
+        },
+        Err(error) => {
+            let error = if error.kind() == io::ErrorKind::UnexpectedEof {
+                FileReadExactlyErr {
+                    payload: FileReadExactlyErrPayload {
+                        file_unexpected_eof: [],
+                    },
+                    tag: FileReadExactlyErrTag::FileUnexpectedEOF,
+                }
+            } else {
+                FileReadExactlyErr {
+                    payload: FileReadExactlyErrPayload {
+                        file_err: ManuallyDrop::new(io_err_from_io(&error, roc_host)),
+                    },
+                    tag: FileReadExactlyErrTag::FileErr,
+                }
+            };
+            FileReadExactlyResult {
+                payload: FileReadExactlyResultPayload {
+                    err: ManuallyDrop::new(error),
+                },
+                tag: FileReadExactlyResultTag::Err,
+            }
+        }
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn hosted_file_reader_position(handle: *mut u64) -> FileSizeResult {
+    let roc_host = roc_host();
+    match with_file_reader(handle, roc_host, file_reader::position) {
+        Ok(position) => try_file_size_ok(position),
+        Err(error) => try_file_size_err(io_err_from_io(&error, roc_host)),
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn hosted_file_reader_seek(handle: *mut u64, from: FileSeekFrom) -> FileSizeResult {
+    let roc_host = roc_host();
+    let from = unsafe {
+        match from.tag {
+            FileSeekFromTag::Start => io::SeekFrom::Start(*from.payload.start),
+            FileSeekFromTag::Current => io::SeekFrom::Current(*from.payload.current),
+            FileSeekFromTag::End => io::SeekFrom::End(*from.payload.end),
+        }
+    };
+    match with_file_reader(handle, roc_host, |reader| file_reader::seek(reader, from)) {
+        Ok(position) => try_file_size_ok(position),
+        Err(error) => try_file_size_err(io_err_from_io(&error, roc_host)),
+    }
 }
 
 fn file_metadata(path: impl IntoRawPath, roc_host: &RocHost) -> io::Result<fs::Metadata> {
@@ -614,6 +717,83 @@ pub extern "C" fn hosted_file_write_utf8(
     match fs::write(path, content_string) {
         Ok(()) => try_file_write_utf8_ok(),
         Err(error) => try_file_write_utf8_err(io_err_from_io(&error, roc_host)),
+    }
+}
+
+#[cfg(unix)]
+fn write_all_at(file: &fs::File, buf: &[u8], offset: u64) -> io::Result<()> {
+    use std::os::unix::fs::FileExt;
+    file.write_all_at(buf, offset)
+}
+
+#[cfg(windows)]
+fn write_all_at(file: &fs::File, mut buf: &[u8], mut offset: u64) -> io::Result<()> {
+    use std::os::windows::fs::FileExt;
+    while !buf.is_empty() {
+        match file.seek_write(buf, offset) {
+            Ok(0) => {
+                return Err(io::Error::new(
+                    io::ErrorKind::WriteZero,
+                    "failed to write the complete buffer",
+                ))
+            }
+            Ok(written) => {
+                buf = &buf[written..];
+                offset += written as u64;
+            }
+            Err(ref error) if error.kind() == io::ErrorKind::Interrupted => {}
+            Err(error) => return Err(error),
+        }
+    }
+    Ok(())
+}
+
+/// Write bytes at byte `offset` into an existing file. Writing past the end
+/// extends the file with a zero-filled gap.
+#[no_mangle]
+pub extern "C" fn hosted_file_write_bytes_at(
+    path: HostFileWriteBytesAtArg0,
+    offset: u64,
+    bytes: RocListWith<u8, false>,
+) -> FileDeleteResult {
+    let roc_host = roc_host();
+    let path = match path_buf_from_raw_path(path, roc_host) {
+        Ok(path) => path,
+        Err(error) => {
+            unsafe { bytes.decref(roc_host) };
+            return try_file_delete_err(io_err_from_io(&error, roc_host));
+        }
+    };
+    let result = (|| -> io::Result<()> {
+        let file = fs::OpenOptions::new().write(true).open(path)?;
+        write_all_at(&file, bytes.as_slice(), offset)
+    })();
+    unsafe { bytes.decref(roc_host) };
+    match result {
+        Ok(()) => try_file_delete_ok(),
+        Err(error) => try_file_delete_err(io_err_from_io(&error, roc_host)),
+    }
+}
+
+/// Set a file's length (creating it if missing): grow sparsely or truncate.
+#[no_mangle]
+pub extern "C" fn hosted_file_set_len(path: HostFileSetLenArg0, len: u64) -> FileDeleteResult {
+    let roc_host = roc_host();
+    let path = match path_buf_from_raw_path(path, roc_host) {
+        Ok(path) => path,
+        Err(error) => return try_file_delete_err(io_err_from_io(&error, roc_host)),
+    };
+    let result = (|| -> io::Result<()> {
+        let file = fs::OpenOptions::new()
+            .create(true)
+            .write(true)
+            .truncate(false)
+            .open(path)?;
+        file.set_len(len)
+    })();
+    match result {
+        Ok(()) => try_file_delete_ok(),
+        Err(error) => try_file_delete_err(io_err_from_io(&error, roc_host)),
     }
 }
 
