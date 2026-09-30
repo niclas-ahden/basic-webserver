@@ -9,6 +9,11 @@ use std::io;
 use std::sync::{Arc, Condvar, Mutex};
 use std::thread::{self, JoinHandle};
 
+/// Stack size of every worker thread. Roc code runs on these threads, and
+/// recursion over a long list (rendering a page of a few thousand rows, say)
+/// needs more than the 2 MiB Rust gives a spawned thread by default.
+const WORKER_STACK_BYTES: usize = 8 * 1024 * 1024;
+
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum AdmissionClass {
     Active,
@@ -127,6 +132,7 @@ impl<T: Send + 'static> FixedExecutor<T> {
             let worker_inner = Arc::clone(&inner);
             match thread::Builder::new()
                 .name(format!("{thread_name}-{index}"))
+                .stack_size(WORKER_STACK_BYTES)
                 .spawn(move || worker_loop(worker_inner))
             {
                 Ok(worker) => worker_handles.push(worker),
