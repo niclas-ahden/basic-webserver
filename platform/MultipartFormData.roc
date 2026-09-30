@@ -149,13 +149,13 @@ parse_all_headers = |bytes| {
 								encoding: encoding,
 								data: List.drop_first(rest, double_newline_length),
 							})
-						}
-				}
-		}
+					}
+			}
+	}
 }
 
 ## Parses the body of a multipart/form-data request.
-parse_form_data : { body : List(U8), boundary : List(U8) } -> Try(List(ParsedFormData), [ExpectedEnclosedByBoundary, InvalidPart, ..])
+parse_form_data : { body : List(U8), boundary : List(U8) } -> Try(List(ParsedFormData), [ExpectedEnclosedByBoundary, InvalidPart])
 parse_form_data = |{ body, boundary }| {
 	start_marker = List.concat(doubledash, boundary)
 	end_marker = List.concat(List.concat(List.concat(List.concat(newline, doubledash), boundary), doubledash), newline)
@@ -173,7 +173,7 @@ parse_form_data = |{ body, boundary }| {
 	}
 }
 
-parse_parts : List(List(U8)), List(ParsedFormData) -> Try(List(ParsedFormData), [ExpectedEnclosedByBoundary, InvalidPart, ..])
+parse_parts : List(List(U8)), List(ParsedFormData) -> Try(List(ParsedFormData), [ExpectedEnclosedByBoundary, InvalidPart])
 parse_parts = |parts, parsed|
 	match parts {
 		[] => Ok(parsed)
@@ -182,9 +182,9 @@ parse_parts = |parts, parsed|
 				Ok(part) => parse_parts(rest, List.append(parsed, part))
 				Err(_) => multipart_data_error(Part)
 			}
-		}
+	}
 
-multipart_data_error : [Boundary, Part] -> Try(List(ParsedFormData), [ExpectedEnclosedByBoundary, InvalidPart, ..])
+multipart_data_error : [Boundary, Part] -> Try(List(ParsedFormData), [ExpectedEnclosedByBoundary, InvalidPart])
 multipart_data_error = |kind|
 	match kind {
 		Boundary => Err(ExpectedEnclosedByBoundary)
@@ -223,7 +223,7 @@ insert_form_field = |state, key, value, dict|
 			chain_utf8(key, |key_str|
 				chain_utf8(value, |value_str|
 					Ok(Dict.insert(dict, key_str, value_str))))
-		}
+	}
 
 url_encoded_help = |bytes_remaining, state, key, chomped, dict| {
 	tail = List.drop_first(bytes_remaining, 1)
@@ -356,7 +356,7 @@ decode_multipart_form_data_boundary = |headers| {
 				Ok({ before: _, after }) => Ok(Str.to_utf8(after))
 				Err(NotFound) => Err(InvalidContentTypeHeader)
 			}
-		}
+	}
 }
 
 # Internal helper: like the old `Str.split_last`.

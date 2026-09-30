@@ -3,7 +3,7 @@
 app [Context, program] {
 	pf: platform "https://github.com/roc-lang/basic-webserver/releases/download/0.16.0/42jC1JT3auhHSmv2Ah8mW5F2MXiAakq1UQQ4NQceQjXw.tar.zst",
 	http: "https://github.com/roc-lang/http/releases/download/1.0.0/6ZUwqYhCS8PU9Mo6MF7oV82ET2o7KYb57CLKDq4cq4sS.tar.zst",
-	roc: "nightly-2026-09-19-d025939",
+	roc: "nightly-2026-09-29-7f11a82",
 }
 
 import pf.Env
@@ -196,7 +196,7 @@ decode_bytes = |decoder, bytes, events|
 					events,
 				)
 			}
-		}
+	}
 
 decode_line : DecoderData -> Try(DecodedEvent, DecodeError)
 decode_line = |decoder| {
@@ -282,7 +282,7 @@ ingest_flush! = |ingest, db| {
 	})
 }
 
-init! : () => Try({ config : Server.Config, context : Context }, [Exit(I64), ..])
+init! : () => Try({ config : Server.Config, context : Context }, [Exit(I64)])
 init! = || {
 	db_path =
 		match Env.var!("DB_PATH") {
@@ -304,7 +304,7 @@ init! = || {
 	Ok({ config, context: db })
 }
 
-respond! : Server.Request, Context => Try(Server.Outcome, [ServerErr(Str), ..])
+respond! : Server.Request, Context => Try(Server.Outcome, [ServerErr(Str)])
 respond! = |request, db| {
 	response =
 		match (request.method(), request.target()) {
@@ -316,7 +316,7 @@ respond! = |request, db| {
 	Ok(Server.respond(response))
 }
 
-shutdown! : Server.ShutdownReason, Context => Try({}, [Exit(I64), ..])
+shutdown! : Server.ShutdownReason, Context => Try({}, [Exit(I64)])
 shutdown! = |_reason, _db| Ok({})
 
 ingest_events! : Sqlite.Db, Server.Request => Response
@@ -347,7 +347,7 @@ ingest_events! = |db, request| {
 				Ok(committed) => committed_response(200, committed)
 				Err(err) => ingest_failure_response(err)
 			}
-		}
+	}
 }
 
 insert_batch! : Sqlite.Transaction, List(DecodedEvent) => Try({}, Sqlite.QueryError)
@@ -411,7 +411,7 @@ has_ndjson_content_type = |headers|
 			} else {
 				has_ndjson_content_type(rest)
 			}
-		}
+	}
 
 ingest_failure_response : IngestError -> Response
 ingest_failure_response = |err|
@@ -450,8 +450,8 @@ expect {
 						Err(_) => Bool.False
 						Ok({}) => done.events.map(|item| item.event.id) == ["evt-1", "evt-2"]
 					}
-				}
-		}
+			}
+	}
 }
 
 expect {
@@ -469,7 +469,7 @@ expect {
 							and line_number == 1
 				_ => Bool.False
 			}
-		}
+	}
 }
 
 expect {
@@ -482,5 +482,5 @@ expect {
 				Err(MissingFinalNewline(line_number)) => line_number == 1
 				_ => Bool.False
 			}
-		}
+	}
 }

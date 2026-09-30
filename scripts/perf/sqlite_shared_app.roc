@@ -18,7 +18,7 @@ Record : { body : Str, category : Str, id : I64 }
 
 program = { init!, respond!, shutdown! }
 
-init! : () => Try({ config : Server.Config, context : Context }, [Exit(I64), ..])
+init! : () => Try({ config : Server.Config, context : Context }, [Exit(I64)])
 init! = || {
 	db_path =
 		match Env.var!("SQLITE_BENCH_DB") {
@@ -61,7 +61,7 @@ init! = || {
 	})
 }
 
-respond! : Server.Request, Context => Try(Server.Outcome, [ServerErr(Str), ..])
+respond! : Server.Request, Context => Try(Server.Outcome, [ServerErr(Str)])
 respond! = |_, context| {
 	row : Record
 	row =
@@ -71,7 +71,7 @@ respond! = |_, context| {
 	Ok(Server.respond(Response.from_status(200).with_body(Str.to_utf8(body))))
 }
 
-shutdown! : Server.ShutdownReason, Context => Try({}, [Exit(I64), ..])
+shutdown! : Server.ShutdownReason, Context => Try({}, [Exit(I64)])
 shutdown! = |_, _| Ok({})
 
 parse_pool_size = |raw| {

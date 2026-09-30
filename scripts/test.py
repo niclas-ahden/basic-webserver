@@ -144,6 +144,41 @@ def command(*args: str | Path, cwd: Path = ROOT) -> None:
     subprocess.run(values, cwd=cwd, check=True)
 
 
+# The location in a warning's header, such as
+# "── ● redundant open tag union ─ ../../.cache/roc/packages/<hash>/Util.roc:44:44".
+ROC_WARNING_LOCATION = re.compile(r"^── ● .*? ─+ (?P<path>\S+?):\d+:\d+\s*$", re.MULTILINE)
+
+
+def roc_command(*args: str | Path, cwd: Path = ROOT) -> None:
+    """Run roc like `command`, but let a run that only warned about downloaded
+    packages pass.
+
+    roc exits 2 when it warned but found no errors. A warning in this
+    repository still fails the run. A warning in a package roc downloaded,
+    such as the redundant `..` in roc-gregorian that several examples import,
+    is shown but cannot be fixed here, so it does not. The platform's own
+    warnings are caught by the `roc test` of platform/main.roc, which runs
+    through `command`.
+    """
+    values = [str(arg) for arg in args]
+    print(f"+ {' '.join(values)}", flush=True)
+    result = subprocess.run(values, cwd=cwd, capture_output=True, text=True)
+    sys.stdout.write(result.stdout)
+    sys.stderr.write(result.stderr)
+    sys.stdout.flush()
+    if result.returncode == 0:
+        return
+    if result.returncode == 2:
+        locations = [
+            (cwd / match.group("path")).resolve()
+            for match in ROC_WARNING_LOCATION.finditer(result.stdout + result.stderr)
+        ]
+        if locations and not any(location.is_relative_to(ROOT) for location in locations):
+            print(f"  ({len(locations)} warnings, all in downloaded packages)", flush=True)
+            return
+    raise subprocess.CalledProcessError(result.returncode, values)
+
+
 def active_sources() -> set[str]:
     sources = {
         path
@@ -651,7 +686,7 @@ def prepare_memcheck_binaries(
         # Use the small native dev backend and remove only its debug sections
         # for now. The symbol table and executable host/ABI code remain
         # available to Memcheck.
-        command(
+        roc_command(
             roc,
             "build",
             copied_source,
@@ -2074,11 +2109,11 @@ def validate_sources(
             if stage == "fmt":
                 command(roc, "fmt", "--check", source)
             else:
-                command(roc, stage, source)
+                roc_command(roc, stage, source)
 
     readme = readme_example(platform_url=platform_url)
-    command(roc, "check", readme)
-    command(roc, "test", readme)
+    roc_command(roc, "check", readme)
+    roc_command(roc, "test", readme)
 
 
 def build_artifacts(
@@ -2102,7 +2137,7 @@ def build_artifacts(
         binary = output_path(ROOT / app_path, target, artifact_dir)
         binary.parent.mkdir(parents=True, exist_ok=True)
         print(f"==> build {app['path']} ({target})", flush=True)
-        command(
+        roc_command(
             roc,
             "build",
             source,
@@ -2113,7 +2148,7 @@ def build_artifacts(
         binaries[str(app["path"])] = binary
 
     readme = readme_example(platform_url=platform_url)
-    command(
+    roc_command(
         roc,
         "build",
         readme,
