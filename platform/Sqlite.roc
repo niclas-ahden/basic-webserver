@@ -145,9 +145,6 @@ Sqlite :: [].{
 
 	## A SQLite BLOB. The nominal wrapper distinguishes blobs from ordinary Roc
 	## lists for generic parsing and encoding.
-	##
-	## TODO: Use `Blob` inside mixed result records once the compiler composes a
-	## custom nominal parser's errors with sibling derived fields.
 	Blob :: { bytes : List(U8) }.{
 
 		from_bytes : List(U8) -> Blob

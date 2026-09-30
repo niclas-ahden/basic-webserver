@@ -18,6 +18,24 @@ import "todos.html" as todo_html : List(U8)
 Context : Sqlite.Db
 
 TodoStatus := [Todo, Planned, Completed, InProgress].{
+	parser_for : encoding -> (state -> Try({ value : TodoStatus, rest : state }, err))
+		where [
+			encoding.parse_str : encoding, state -> Try({ value : Str, rest : state }, err),
+			encoding.invalid_value : encoding, state -> err,
+		]
+	parser_for = |encoding| {
+		Encoding : encoding
+
+		|state| {
+			parsed = Encoding.parse_str(encoding, state)?
+
+			match parse_todo_status(parsed.value) {
+				Ok(status) => Ok({ value: status, rest: parsed.rest })
+				Err(_) => Err(Encoding.invalid_value(encoding, state))
+			}
+		}
+	}
+
 	encoder_for : encoding -> (TodoStatus, state -> Try(state, err))
 		where [
 			encoding.encode_str : Str, state -> Try(state, err),
@@ -30,10 +48,6 @@ TodoStatus := [Todo, Planned, Completed, InProgress].{
 }
 
 Todo : { id : I64, task : Str, status : TodoStatus }
-
-# TODO: Decode `Todo` directly once application-defined `parser_for` methods
-# compose their validation errors through a platform-derived record parser.
-StoredTodo : { id : I64, task : Str, status : Str }
 
 CreateTodoBody : { task : Str, status : Str }
 
@@ -92,8 +106,8 @@ route_todos! = |db, req|
 
 list_todos! : Sqlite.Db => Try(Response, _)
 list_todos! = |db| {
-	stored : List(StoredTodo)
-	stored =
+	todos : List(Todo)
+	todos =
 		Sqlite.query_many!({
 			db,
 			query: "SELECT id, task, status FROM todos ORDER BY id;",
@@ -101,8 +115,6 @@ list_todos! = |db| {
 			limits: Sqlite.default_query_limits,
 		})
 			? |err| DbErr(Str.inspect(err))
-	todos = stored.map_try(decode_stored_todo)
-		? |err| DbErr(Str.inspect(err))
 
 	Ok(json_response(todos))
 }
@@ -138,33 +150,21 @@ create_todo_from_request! = |db, req| {
 
 create_todo! : Sqlite.Db, { task : Str, status : TodoStatus } => Try(Response, _)
 create_todo! = |db, params| {
-	stored : StoredTodo
-	stored =
+	todo : Todo
+	todo =
 		Sqlite.query!({
 			db,
 			query: "INSERT INTO todos (task, status) VALUES (:task, :status) RETURNING id, task, status;",
 			params: {
 				task: params.task,
-				# TODO: Pass `params.status` directly once a nested
-				# application-defined `encoder_for` receives the field state
-				# across the platform boundary.
-				status: todo_status_to_str(params.status),
+				status: params.status,
 			},
 			limits: Sqlite.default_query_limits,
 		})
 			? |err| DbErr(Str.inspect(err))
-	todo = decode_stored_todo(stored)
-		? |err| DbErr(Str.inspect(err))
 
 	Ok(json_response([todo]))
 }
-
-decode_stored_todo : StoredTodo -> Try(Todo, Sqlite.QueryError)
-decode_stored_todo = |stored|
-	match parse_todo_status(stored.status) {
-		Ok(status) => Ok({ id: stored.id, task: stored.task, status })
-		Err(_) => Err(InvalidValue({ column: "status" }))
-	}
 
 parse_todo_status : Str -> Try(TodoStatus, [InvalidTodoStatus])
 parse_todo_status = |status|

@@ -193,9 +193,9 @@ multipart_data_error = |kind|
 
 ## Parse URL-encoded form values (`todo=foo&status=bar`) into a Dict (`("todo", "foo"), ("status", "bar")`).
 #
-# TODO: Replace the validation pass plus single-error recursive decoder with
-# one recursive decoder returning `[BadUtf8, InvalidPercentEncoding]` once the
-# optimized backend correctly compiles that recursive error union.
+# The validation pass runs first so an invalid percent escape anywhere in the
+# body is reported as InvalidPercentEncoding, even when an earlier field is not
+# valid UTF-8.
 parse_form_url_encoded_impl : List(U8) -> Try(Dict(Str, Str), [BadUtf8, InvalidPercentEncoding])
 parse_form_url_encoded_impl = |bytes| {
 	if percent_encoding_is_valid(bytes) {

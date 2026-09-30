@@ -57,32 +57,49 @@ shutdown! = |_reason, _context| Ok({})
 
 Todo : { id : I64, status : TodoStatus, task : Str }
 
-# TODO: Decode `Todo` directly once application-defined `parser_for` methods
-# compose their validation errors through a platform-derived record parser.
-StoredTodo : { id : I64, status : Str, task : Str }
-
 query_todos_by_status! : Sqlite.Db, TodoStatus => Try(List(Todo), Sqlite.QueryError)
 query_todos_by_status! = |db, status| {
 	transaction = Sqlite.begin!(db, Deferred)?
-	stored : List(StoredTodo)
-	stored = transaction.query_many!({
+	todos : List(Todo)
+	todos = transaction.query_many!({
 		query: "SELECT id, task, status FROM todos WHERE status = :status;",
-		# TODO: Pass `status` directly once a nested application-defined
-		# `encoder_for` receives the field state across the platform boundary.
-		params: { status: todo_status_to_str(status) },
+		params: { status },
 		limits: Sqlite.default_query_limits,
 	})?
 	transaction.commit!()?
 
-	stored.map_try(
-		|todo| match parse_todo_status(todo.status) {
-			Ok(decoded_status) => Ok({ id: todo.id, status: decoded_status, task: todo.task })
-			Err(_) => Err(InvalidValue({ column: "status" }))
-		},
-	)
+	Ok(todos)
 }
 
-TodoStatus := [Todo, Planned, Completed, InProgress].{}
+TodoStatus := [Todo, Planned, Completed, InProgress].{
+	parser_for : encoding -> (state -> Try({ value : TodoStatus, rest : state }, err))
+		where [
+			encoding.parse_str : encoding, state -> Try({ value : Str, rest : state }, err),
+			encoding.invalid_value : encoding, state -> err,
+		]
+	parser_for = |encoding| {
+		Encoding : encoding
+
+		|state| {
+			parsed = Encoding.parse_str(encoding, state)?
+
+			match parse_todo_status(parsed.value) {
+				Ok(status) => Ok({ value: status, rest: parsed.rest })
+				Err(_) => Err(Encoding.invalid_value(encoding, state))
+			}
+		}
+	}
+
+	encoder_for : encoding -> (TodoStatus, state -> Try(state, err))
+		where [
+			encoding.encode_str : Str, state -> Try(state, err),
+		]
+	encoder_for = |_encoding| {
+		Encoding : encoding
+
+		|status, state| Encoding.encode_str(todo_status_to_str(status), state)
+	}
+}
 
 todo_status_to_str : TodoStatus -> Str
 todo_status_to_str = |status|

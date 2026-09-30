@@ -532,8 +532,6 @@ def stage_enabled(defaults: dict[str, bool], app: dict[str, object], stage: str)
     return value
 
 
-# TODO: Investigate the Roc compiler bugs that make the LLVM speed backend use
-# several GiB for some applications. Remove per-app dev overrides once fixed.
 def build_optimization(app: dict[str, object]) -> str:
     value = app.get("build_opt", "speed")
     assert isinstance(value, str) and value in BUILD_OPTIMIZATIONS
@@ -679,13 +677,11 @@ def prepare_memcheck_binaries(
         binary = binary_dir / output_relative_path(source, "x64glibc")
         binary.parent.mkdir(parents=True, exist_ok=True)
         print(f"==> memcheck build {app['path']} (x64glibc)", flush=True)
-        # TODO: Investigate these Roc compiler bugs upstream, then restore the
-        # LLVM speed backend without stripping debug information. The speed
-        # backend can currently require several GiB while specializing one
-        # application, and Valgrind 3.22 rejects the dev backend's DWARF.
-        # Use the small native dev backend and remove only its debug sections
-        # for now. The symbol table and executable host/ABI code remain
-        # available to Memcheck.
+        # TODO: Build with each application's own optimization level and keep
+        # the debug information once that is proven under Memcheck. Until then
+        # the dev backend is used, with its debug sections removed because
+        # Valgrind 3.22 rejects its DWARF. The symbol table and executable
+        # host/ABI code remain available to Memcheck.
         roc_command(
             roc,
             "build",

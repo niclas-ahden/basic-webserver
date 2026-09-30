@@ -352,16 +352,15 @@ class SpecValidationTests(unittest.TestCase):
         self.assertEqual({str(app["path"]) for app in apps}, test.active_sources())
 
     def test_build_optimization_defaults_to_speed(self) -> None:
-        _, apps = test.load_spec()
-        by_path = {str(app["path"]): app for app in apps}
-
         self.assertEqual(
-            test.build_optimization(by_path["examples/form-url-encoded.roc"]),
-            "dev",
+            test.build_optimization({"path": "examples/hello-web.roc"}),
+            "speed",
         )
         self.assertEqual(
-            test.build_optimization(by_path["examples/hello-web.roc"]),
-            "speed",
+            test.build_optimization(
+                {"path": "examples/hello-web.roc", "build_opt": "dev"}
+            ),
+            "dev",
         )
 
     def test_skip_requires_a_reason(self) -> None:
