@@ -54,6 +54,17 @@ pub extern "C" fn main(_argc: i32, _argv: *const *const std::ffi::c_char) -> i32
 }
 
 pub fn rust_main() -> i32 {
+    // Unlike a Rust executable, this C-ABI entrypoint does not pass through
+    // std::rt's signal initialization, so SIGPIPE would keep its default
+    // action and end the process. A write to a socket the peer closed then
+    // kills the server instead of failing with BrokenPipe, whenever it goes
+    // through writev rather than send with MSG_NOSIGNAL, as hyper's and
+    // tokio's vectored writes do.
+    // std::process restores SIGPIPE's default disposition in spawned children.
+    #[cfg(unix)]
+    unsafe {
+        libc::signal(libc::SIGPIPE, libc::SIG_IGN);
+    }
     env::initialize_launch_dir();
     abi::initialize_roc_host();
     #[cfg(feature = "benchmark-simulation")]
