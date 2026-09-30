@@ -162,16 +162,20 @@ def roc_command(*args: str | Path, cwd: Path = ROOT) -> None:
     """
     values = [str(arg) for arg in args]
     print(f"+ {' '.join(values)}", flush=True)
-    result = subprocess.run(values, cwd=cwd, capture_output=True, text=True)
-    sys.stdout.write(result.stdout)
-    sys.stderr.write(result.stderr)
-    sys.stdout.flush()
+    # Pass roc's UTF-8 output through as bytes. Decoding it with the locale
+    # encoding (cp1252 on Windows) fails on the box characters in warnings.
+    result = subprocess.run(values, cwd=cwd, capture_output=True)
+    sys.stdout.buffer.write(result.stdout)
+    sys.stdout.buffer.flush()
+    sys.stderr.buffer.write(result.stderr)
+    sys.stderr.buffer.flush()
     if result.returncode == 0:
         return
     if result.returncode == 2:
+        output = (result.stdout + result.stderr).decode("utf-8", errors="replace")
         locations = [
             (cwd / match.group("path")).resolve()
-            for match in ROC_WARNING_LOCATION.finditer(result.stdout + result.stderr)
+            for match in ROC_WARNING_LOCATION.finditer(output)
         ]
         if locations and not any(location.is_relative_to(ROOT) for location in locations):
             print(f"  ({len(locations)} warnings, all in downloaded packages)", flush=True)
