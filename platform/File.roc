@@ -1,7 +1,7 @@
 import Host
 import InternalPath
 import Path
-import IOErr exposing [IOErr]
+import IOErr
 
 ## Open files for incremental, buffered reading and seek within them.
 ##
