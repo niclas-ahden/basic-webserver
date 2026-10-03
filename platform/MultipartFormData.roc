@@ -21,7 +21,6 @@ MultipartFormData :: [].{
 
 	## One decoded multipart body part.
 	FormData : {
-
 		## Raw Content-Disposition field value, including optional leading
 		## whitespace after the colon.
 		disposition : List(U8),
@@ -50,7 +49,6 @@ MultipartFormData :: [].{
 }
 
 ParsedFormData : {
-
 	## Content-Disposition response header
 	## Indicates if content expects to be displayed inline or as attachment.
 	##

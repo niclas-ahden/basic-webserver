@@ -4518,14 +4518,14 @@ const _: () = assert!(core::mem::offset_of!(FileErrOrFileUnexpectedEOF, tag) == 
 /// Tag discriminant for Try.
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum HostFileSizeInBytesResultTag {
+pub enum HostFileReaderPositionResultTag {
     Err = 0,
     Ok = 1,
 }
 
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub union HostFileSizeInBytesResultPayload {
+pub union HostFileReaderPositionResultPayload {
     pub err: core::mem::ManuallyDrop<IOErr>,
     pub ok: core::mem::ManuallyDrop<u64>,
 }
@@ -4533,32 +4533,32 @@ pub union HostFileSizeInBytesResultPayload {
 #[cfg(target_pointer_width = "32")]
 #[repr(align(8))]
 #[derive(Clone, Copy)]
-pub struct HostFileSizeInBytesResultPayloadAlignment;
+pub struct HostFileReaderPositionResultPayloadAlignment;
 
 /// Tag union: Try
 #[cfg(target_pointer_width = "32")]
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct HostFileSizeInBytesResult {
-    pub _payload_alignment: [HostFileSizeInBytesResultPayloadAlignment; 0],
+pub struct HostFileReaderPositionResult {
+    pub _payload_alignment: [HostFileReaderPositionResultPayloadAlignment; 0],
     pub payload: [u8; 16],
-    pub tag: HostFileSizeInBytesResultTag,
+    pub tag: HostFileReaderPositionResultTag,
 }
 
 /// Tag union: Try
 #[cfg(not(target_pointer_width = "32"))]
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct HostFileSizeInBytesResult {
-    pub payload: HostFileSizeInBytesResultPayload,
-    pub tag: HostFileSizeInBytesResultTag,
+pub struct HostFileReaderPositionResult {
+    pub payload: HostFileReaderPositionResultPayload,
+    pub tag: HostFileReaderPositionResultTag,
 }
 
-impl HostFileSizeInBytesResult {
+impl HostFileReaderPositionResult {
     /// Borrow the `Err` payload without creating another owner.
     ///
     /// # Safety
-    /// `self.tag` must be `HostFileSizeInBytesResultTag::Err` and the payload must still be initialized.
+    /// `self.tag` must be `HostFileReaderPositionResultTag::Err` and the payload must still be initialized.
     #[cfg(target_pointer_width = "32")]
     pub unsafe fn borrow_payload_err_unchecked(&self) -> &IOErr {
         unsafe { &*(self.payload.as_ptr() as *const IOErr) }
@@ -4567,7 +4567,7 @@ impl HostFileSizeInBytesResult {
     /// Borrow the `Err` payload without creating another owner.
     ///
     /// # Safety
-    /// `self.tag` must be `HostFileSizeInBytesResultTag::Err` and the payload must still be initialized.
+    /// `self.tag` must be `HostFileReaderPositionResultTag::Err` and the payload must still be initialized.
     #[cfg(not(target_pointer_width = "32"))]
     pub unsafe fn borrow_payload_err_unchecked(&self) -> &IOErr {
         unsafe { &*(&self.payload.err as *const core::mem::ManuallyDrop<IOErr> as *const IOErr) }
@@ -4576,7 +4576,7 @@ impl HostFileSizeInBytesResult {
     /// Move the `Err` payload out of one owned tag-union shell.
     ///
     /// # Safety
-    /// `self.tag` must be `HostFileSizeInBytesResultTag::Err`. After this call, `self` is logically uninitialized and must not be read or destroyed.
+    /// `self.tag` must be `HostFileReaderPositionResultTag::Err`. After this call, `self` is logically uninitialized and must not be read or destroyed.
     #[cfg(target_pointer_width = "32")]
     pub unsafe fn take_payload_err_unchecked(&mut self) -> IOErr {
         unsafe { core::ptr::read(self.payload.as_ptr() as *const IOErr) }
@@ -4585,7 +4585,7 @@ impl HostFileSizeInBytesResult {
     /// Move the `Err` payload out of one owned tag-union shell.
     ///
     /// # Safety
-    /// `self.tag` must be `HostFileSizeInBytesResultTag::Err`. After this call, `self` is logically uninitialized and must not be read or destroyed.
+    /// `self.tag` must be `HostFileReaderPositionResultTag::Err`. After this call, `self` is logically uninitialized and must not be read or destroyed.
     #[cfg(not(target_pointer_width = "32"))]
     pub unsafe fn take_payload_err_unchecked(&mut self) -> IOErr {
         unsafe { core::mem::ManuallyDrop::take(&mut self.payload.err) }
@@ -4594,7 +4594,7 @@ impl HostFileSizeInBytesResult {
     /// Borrow the `Ok` payload without creating another owner.
     ///
     /// # Safety
-    /// `self.tag` must be `HostFileSizeInBytesResultTag::Ok` and the payload must still be initialized.
+    /// `self.tag` must be `HostFileReaderPositionResultTag::Ok` and the payload must still be initialized.
     #[cfg(target_pointer_width = "32")]
     pub unsafe fn borrow_payload_ok_unchecked(&self) -> &u64 {
         unsafe { &*(self.payload.as_ptr() as *const u64) }
@@ -4603,7 +4603,7 @@ impl HostFileSizeInBytesResult {
     /// Borrow the `Ok` payload without creating another owner.
     ///
     /// # Safety
-    /// `self.tag` must be `HostFileSizeInBytesResultTag::Ok` and the payload must still be initialized.
+    /// `self.tag` must be `HostFileReaderPositionResultTag::Ok` and the payload must still be initialized.
     #[cfg(not(target_pointer_width = "32"))]
     pub unsafe fn borrow_payload_ok_unchecked(&self) -> &u64 {
         unsafe { &*(&self.payload.ok as *const core::mem::ManuallyDrop<u64> as *const u64) }
@@ -4612,7 +4612,7 @@ impl HostFileSizeInBytesResult {
     /// Move the `Ok` payload out of one owned tag-union shell.
     ///
     /// # Safety
-    /// `self.tag` must be `HostFileSizeInBytesResultTag::Ok`. After this call, `self` is logically uninitialized and must not be read or destroyed.
+    /// `self.tag` must be `HostFileReaderPositionResultTag::Ok`. After this call, `self` is logically uninitialized and must not be read or destroyed.
     #[cfg(target_pointer_width = "32")]
     pub unsafe fn take_payload_ok_unchecked(&mut self) -> u64 {
         unsafe { core::ptr::read(self.payload.as_ptr() as *const u64) }
@@ -4621,7 +4621,7 @@ impl HostFileSizeInBytesResult {
     /// Move the `Ok` payload out of one owned tag-union shell.
     ///
     /// # Safety
-    /// `self.tag` must be `HostFileSizeInBytesResultTag::Ok`. After this call, `self` is logically uninitialized and must not be read or destroyed.
+    /// `self.tag` must be `HostFileReaderPositionResultTag::Ok`. After this call, `self` is logically uninitialized and must not be read or destroyed.
     #[cfg(not(target_pointer_width = "32"))]
     pub unsafe fn take_payload_ok_unchecked(&mut self) -> u64 {
         unsafe { core::mem::ManuallyDrop::take(&mut self.payload.ok) }
@@ -4630,17 +4630,17 @@ impl HostFileSizeInBytesResult {
 }
 
 #[cfg(target_pointer_width = "64")]
-const _: () = assert!(core::mem::size_of::<HostFileSizeInBytesResult>() == 40, "HostFileSizeInBytesResult size mismatch");
+const _: () = assert!(core::mem::size_of::<HostFileReaderPositionResult>() == 40, "HostFileReaderPositionResult size mismatch");
 #[cfg(target_pointer_width = "64")]
-const _: () = assert!(core::mem::align_of::<HostFileSizeInBytesResult>() == 8, "HostFileSizeInBytesResult alignment mismatch");
+const _: () = assert!(core::mem::align_of::<HostFileReaderPositionResult>() == 8, "HostFileReaderPositionResult alignment mismatch");
 #[cfg(target_pointer_width = "64")]
-const _: () = assert!(core::mem::offset_of!(HostFileSizeInBytesResult, tag) == 32, "HostFileSizeInBytesResult tag offset mismatch");
+const _: () = assert!(core::mem::offset_of!(HostFileReaderPositionResult, tag) == 32, "HostFileReaderPositionResult tag offset mismatch");
 #[cfg(target_pointer_width = "32")]
-const _: () = assert!(core::mem::size_of::<HostFileSizeInBytesResult>() == 24, "HostFileSizeInBytesResult size mismatch");
+const _: () = assert!(core::mem::size_of::<HostFileReaderPositionResult>() == 24, "HostFileReaderPositionResult size mismatch");
 #[cfg(target_pointer_width = "32")]
-const _: () = assert!(core::mem::align_of::<HostFileSizeInBytesResult>() == 8, "HostFileSizeInBytesResult alignment mismatch");
+const _: () = assert!(core::mem::align_of::<HostFileReaderPositionResult>() == 8, "HostFileReaderPositionResult alignment mismatch");
 #[cfg(target_pointer_width = "32")]
-const _: () = assert!(core::mem::offset_of!(HostFileSizeInBytesResult, tag) == 16, "HostFileSizeInBytesResult tag offset mismatch");
+const _: () = assert!(core::mem::offset_of!(HostFileReaderPositionResult, tag) == 16, "HostFileReaderPositionResult tag offset mismatch");
 
 /// Tag discriminant for CurrentOrEndOrStart.
 #[repr(u8)]
@@ -8461,14 +8461,14 @@ const _: () = assert!(core::mem::offset_of!(HostTcpConnectResult, tag) == 12, "H
 /// Tag discriminant for Try.
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum HostTcpReadUpToResultTag {
+pub enum HostTcpReadExactlyResultTag {
     Err = 0,
     Ok = 1,
 }
 
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub union HostTcpReadUpToResultPayload {
+pub union HostTcpReadExactlyResultPayload {
     pub err: core::mem::ManuallyDrop<RocStr>,
     pub ok: core::mem::ManuallyDrop<RocListWith<u8, false>>,
 }
@@ -8476,32 +8476,32 @@ pub union HostTcpReadUpToResultPayload {
 #[cfg(target_pointer_width = "32")]
 #[repr(align(4))]
 #[derive(Clone, Copy)]
-pub struct HostTcpReadUpToResultPayloadAlignment;
+pub struct HostTcpReadExactlyResultPayloadAlignment;
 
 /// Tag union: Try
 #[cfg(target_pointer_width = "32")]
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct HostTcpReadUpToResult {
-    pub _payload_alignment: [HostTcpReadUpToResultPayloadAlignment; 0],
+pub struct HostTcpReadExactlyResult {
+    pub _payload_alignment: [HostTcpReadExactlyResultPayloadAlignment; 0],
     pub payload: [u8; 12],
-    pub tag: HostTcpReadUpToResultTag,
+    pub tag: HostTcpReadExactlyResultTag,
 }
 
 /// Tag union: Try
 #[cfg(not(target_pointer_width = "32"))]
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct HostTcpReadUpToResult {
-    pub payload: HostTcpReadUpToResultPayload,
-    pub tag: HostTcpReadUpToResultTag,
+pub struct HostTcpReadExactlyResult {
+    pub payload: HostTcpReadExactlyResultPayload,
+    pub tag: HostTcpReadExactlyResultTag,
 }
 
-impl HostTcpReadUpToResult {
+impl HostTcpReadExactlyResult {
     /// Borrow the `Err` payload without creating another owner.
     ///
     /// # Safety
-    /// `self.tag` must be `HostTcpReadUpToResultTag::Err` and the payload must still be initialized.
+    /// `self.tag` must be `HostTcpReadExactlyResultTag::Err` and the payload must still be initialized.
     #[cfg(target_pointer_width = "32")]
     pub unsafe fn borrow_payload_err_unchecked(&self) -> &RocStr {
         unsafe { &*(self.payload.as_ptr() as *const RocStr) }
@@ -8510,7 +8510,7 @@ impl HostTcpReadUpToResult {
     /// Borrow the `Err` payload without creating another owner.
     ///
     /// # Safety
-    /// `self.tag` must be `HostTcpReadUpToResultTag::Err` and the payload must still be initialized.
+    /// `self.tag` must be `HostTcpReadExactlyResultTag::Err` and the payload must still be initialized.
     #[cfg(not(target_pointer_width = "32"))]
     pub unsafe fn borrow_payload_err_unchecked(&self) -> &RocStr {
         unsafe { &*(&self.payload.err as *const core::mem::ManuallyDrop<RocStr> as *const RocStr) }
@@ -8519,7 +8519,7 @@ impl HostTcpReadUpToResult {
     /// Move the `Err` payload out of one owned tag-union shell.
     ///
     /// # Safety
-    /// `self.tag` must be `HostTcpReadUpToResultTag::Err`. After this call, `self` is logically uninitialized and must not be read or destroyed.
+    /// `self.tag` must be `HostTcpReadExactlyResultTag::Err`. After this call, `self` is logically uninitialized and must not be read or destroyed.
     #[cfg(target_pointer_width = "32")]
     pub unsafe fn take_payload_err_unchecked(&mut self) -> RocStr {
         unsafe { core::ptr::read(self.payload.as_ptr() as *const RocStr) }
@@ -8528,7 +8528,7 @@ impl HostTcpReadUpToResult {
     /// Move the `Err` payload out of one owned tag-union shell.
     ///
     /// # Safety
-    /// `self.tag` must be `HostTcpReadUpToResultTag::Err`. After this call, `self` is logically uninitialized and must not be read or destroyed.
+    /// `self.tag` must be `HostTcpReadExactlyResultTag::Err`. After this call, `self` is logically uninitialized and must not be read or destroyed.
     #[cfg(not(target_pointer_width = "32"))]
     pub unsafe fn take_payload_err_unchecked(&mut self) -> RocStr {
         unsafe { core::mem::ManuallyDrop::take(&mut self.payload.err) }
@@ -8537,7 +8537,7 @@ impl HostTcpReadUpToResult {
     /// Borrow the `Ok` payload without creating another owner.
     ///
     /// # Safety
-    /// `self.tag` must be `HostTcpReadUpToResultTag::Ok` and the payload must still be initialized.
+    /// `self.tag` must be `HostTcpReadExactlyResultTag::Ok` and the payload must still be initialized.
     #[cfg(target_pointer_width = "32")]
     pub unsafe fn borrow_payload_ok_unchecked(&self) -> &RocListWith<u8, false> {
         unsafe { &*(self.payload.as_ptr() as *const RocListWith<u8, false>) }
@@ -8546,7 +8546,7 @@ impl HostTcpReadUpToResult {
     /// Borrow the `Ok` payload without creating another owner.
     ///
     /// # Safety
-    /// `self.tag` must be `HostTcpReadUpToResultTag::Ok` and the payload must still be initialized.
+    /// `self.tag` must be `HostTcpReadExactlyResultTag::Ok` and the payload must still be initialized.
     #[cfg(not(target_pointer_width = "32"))]
     pub unsafe fn borrow_payload_ok_unchecked(&self) -> &RocListWith<u8, false> {
         unsafe { &*(&self.payload.ok as *const core::mem::ManuallyDrop<RocListWith<u8, false>> as *const RocListWith<u8, false>) }
@@ -8555,7 +8555,7 @@ impl HostTcpReadUpToResult {
     /// Move the `Ok` payload out of one owned tag-union shell.
     ///
     /// # Safety
-    /// `self.tag` must be `HostTcpReadUpToResultTag::Ok`. After this call, `self` is logically uninitialized and must not be read or destroyed.
+    /// `self.tag` must be `HostTcpReadExactlyResultTag::Ok`. After this call, `self` is logically uninitialized and must not be read or destroyed.
     #[cfg(target_pointer_width = "32")]
     pub unsafe fn take_payload_ok_unchecked(&mut self) -> RocListWith<u8, false> {
         unsafe { core::ptr::read(self.payload.as_ptr() as *const RocListWith<u8, false>) }
@@ -8564,7 +8564,7 @@ impl HostTcpReadUpToResult {
     /// Move the `Ok` payload out of one owned tag-union shell.
     ///
     /// # Safety
-    /// `self.tag` must be `HostTcpReadUpToResultTag::Ok`. After this call, `self` is logically uninitialized and must not be read or destroyed.
+    /// `self.tag` must be `HostTcpReadExactlyResultTag::Ok`. After this call, `self` is logically uninitialized and must not be read or destroyed.
     #[cfg(not(target_pointer_width = "32"))]
     pub unsafe fn take_payload_ok_unchecked(&mut self) -> RocListWith<u8, false> {
         unsafe { core::mem::ManuallyDrop::take(&mut self.payload.ok) }
@@ -8573,17 +8573,17 @@ impl HostTcpReadUpToResult {
 }
 
 #[cfg(target_pointer_width = "64")]
-const _: () = assert!(core::mem::size_of::<HostTcpReadUpToResult>() == 32, "HostTcpReadUpToResult size mismatch");
+const _: () = assert!(core::mem::size_of::<HostTcpReadExactlyResult>() == 32, "HostTcpReadExactlyResult size mismatch");
 #[cfg(target_pointer_width = "64")]
-const _: () = assert!(core::mem::align_of::<HostTcpReadUpToResult>() == 8, "HostTcpReadUpToResult alignment mismatch");
+const _: () = assert!(core::mem::align_of::<HostTcpReadExactlyResult>() == 8, "HostTcpReadExactlyResult alignment mismatch");
 #[cfg(target_pointer_width = "64")]
-const _: () = assert!(core::mem::offset_of!(HostTcpReadUpToResult, tag) == 24, "HostTcpReadUpToResult tag offset mismatch");
+const _: () = assert!(core::mem::offset_of!(HostTcpReadExactlyResult, tag) == 24, "HostTcpReadExactlyResult tag offset mismatch");
 #[cfg(target_pointer_width = "32")]
-const _: () = assert!(core::mem::size_of::<HostTcpReadUpToResult>() == 16, "HostTcpReadUpToResult size mismatch");
+const _: () = assert!(core::mem::size_of::<HostTcpReadExactlyResult>() == 16, "HostTcpReadExactlyResult size mismatch");
 #[cfg(target_pointer_width = "32")]
-const _: () = assert!(core::mem::align_of::<HostTcpReadUpToResult>() == 4, "HostTcpReadUpToResult alignment mismatch");
+const _: () = assert!(core::mem::align_of::<HostTcpReadExactlyResult>() == 4, "HostTcpReadExactlyResult alignment mismatch");
 #[cfg(target_pointer_width = "32")]
-const _: () = assert!(core::mem::offset_of!(HostTcpReadUpToResult, tag) == 12, "HostTcpReadUpToResult tag offset mismatch");
+const _: () = assert!(core::mem::offset_of!(HostTcpReadExactlyResult, tag) == 12, "HostTcpReadExactlyResult tag offset mismatch");
 
 /// Tag discriminant for Try.
 #[repr(u8)]
@@ -9734,6 +9734,35 @@ const _: () = assert!(core::mem::align_of::<ShutdownForHostResult>() == 8, "Shut
 #[cfg(target_pointer_width = "32")]
 const _: () = assert!(core::mem::offset_of!(ShutdownForHostResult, tag) == 8, "ShutdownForHostResult tag offset mismatch");
 
+/// Return type record for Host.env_current_arch_os!
+/// Fields ordered by compiler-emitted ABI offsets.
+#[cfg(target_pointer_width = "32")]
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostEnvCurrentArchOsRetRecord {
+    pub arch: RocStr,
+    pub os: RocStr,
+}
+
+/// Return type record for Host.env_current_arch_os!
+/// Fields ordered by compiler-emitted ABI offsets.
+#[cfg(not(target_pointer_width = "32"))]
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostEnvCurrentArchOsRetRecord {
+    pub arch: RocStr,
+    pub os: RocStr,
+}
+
+#[cfg(target_pointer_width = "64")]
+const _: () = assert!(core::mem::size_of::<HostEnvCurrentArchOsRetRecord>() == 48, "HostEnvCurrentArchOsRetRecord size mismatch");
+#[cfg(target_pointer_width = "64")]
+const _: () = assert!(core::mem::align_of::<HostEnvCurrentArchOsRetRecord>() == 8, "HostEnvCurrentArchOsRetRecord alignment mismatch");
+#[cfg(target_pointer_width = "32")]
+const _: () = assert!(core::mem::size_of::<HostEnvCurrentArchOsRetRecord>() == 24, "HostEnvCurrentArchOsRetRecord size mismatch");
+#[cfg(target_pointer_width = "32")]
+const _: () = assert!(core::mem::align_of::<HostEnvCurrentArchOsRetRecord>() == 4, "HostEnvCurrentArchOsRetRecord alignment mismatch");
+
 /// Return type record for Host.env_temp_dir!
 /// Fields ordered by compiler-emitted ABI offsets.
 #[cfg(target_pointer_width = "32")]
@@ -9765,35 +9794,6 @@ const _: () = assert!(core::mem::size_of::<HostEnvTempDirRetRecord>() == 28, "Ho
 #[cfg(target_pointer_width = "32")]
 const _: () = assert!(core::mem::align_of::<HostEnvTempDirRetRecord>() == 4, "HostEnvTempDirRetRecord alignment mismatch");
 
-/// Return type record for Host.env_current_arch_os!
-/// Fields ordered by compiler-emitted ABI offsets.
-#[cfg(target_pointer_width = "32")]
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostEnvCurrentArchOsRetRecord {
-    pub arch: RocStr,
-    pub os: RocStr,
-}
-
-/// Return type record for Host.env_current_arch_os!
-/// Fields ordered by compiler-emitted ABI offsets.
-#[cfg(not(target_pointer_width = "32"))]
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostEnvCurrentArchOsRetRecord {
-    pub arch: RocStr,
-    pub os: RocStr,
-}
-
-#[cfg(target_pointer_width = "64")]
-const _: () = assert!(core::mem::size_of::<HostEnvCurrentArchOsRetRecord>() == 48, "HostEnvCurrentArchOsRetRecord size mismatch");
-#[cfg(target_pointer_width = "64")]
-const _: () = assert!(core::mem::align_of::<HostEnvCurrentArchOsRetRecord>() == 8, "HostEnvCurrentArchOsRetRecord alignment mismatch");
-#[cfg(target_pointer_width = "32")]
-const _: () = assert!(core::mem::size_of::<HostEnvCurrentArchOsRetRecord>() == 24, "HostEnvCurrentArchOsRetRecord size mismatch");
-#[cfg(target_pointer_width = "32")]
-const _: () = assert!(core::mem::align_of::<HostEnvCurrentArchOsRetRecord>() == 4, "HostEnvCurrentArchOsRetRecord alignment mismatch");
-
 /// Arguments for Host.cmd_exec_exit_code!
 /// Roc signature: { args : List([UnixBytes(List(U8)), Utf8(Str), WindowsU16s(List(U16))]), clear_envs : Bool, envs : List({ name : [UnixBytes(List(U8)), Utf8(Str), WindowsU16s(List(U16))], value : [UnixBytes(List(U8)), Utf8(Str), WindowsU16s(List(U16))] }), program : [UnixBytes(List(U8)), Utf8(Str), WindowsU16s(List(U16))], stderr_limit_bytes : U64, stdout_limit_bytes : U64, timeout_ms : U64 }, [Inherit, Set([UnixBytes(List(U8)), Utf8(Str), WindowsU16s(List(U16))])] => Try(I32, [FailedToGetExitCode(IOErr), Saturated, Timeout])
 /// Refcounted fields are owned by the hosted function.
@@ -9812,6 +9812,38 @@ pub struct HostCmdExecExitCodeArgs {
 pub struct HostCmdExecOutputArgs {
     pub arg0: AnonStructE09af2c5b0324fa8,
     pub arg1: InheritOrSet,
+}
+
+/// Arguments for Host.crypt_decrypt_aes256_gcm!
+/// Roc signature: List(U8), List(U8), List(U8), List(U8) => Try(List(U8), [CryptoErr(Str)])
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostCryptDecryptAes256GcmArgs {
+    pub arg0: RocListWith<u8, false>,
+    pub arg1: RocListWith<u8, false>,
+    pub arg2: RocListWith<u8, false>,
+    pub arg3: RocListWith<u8, false>,
+}
+
+/// Arguments for Host.crypt_encrypt_aes256_gcm!
+/// Roc signature: List(U8), List(U8), List(U8) => Try({ auth_tag : List(U8), ciphertext : List(U8) }, [CryptoErr(Str)])
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostCryptEncryptAes256GcmArgs {
+    pub arg0: RocListWith<u8, false>,
+    pub arg1: RocListWith<u8, false>,
+    pub arg2: RocListWith<u8, false>,
+}
+
+/// Arguments for Host.crypt_sha1!
+/// Roc signature: List(U8) => Str
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostCryptSha1Args {
+    pub arg0: RocListWith<u8, false>,
 }
 
 /// Arguments for Host.dir_create!
@@ -10134,12 +10166,12 @@ unsafe impl RocRelease<HostDirListArgs> for HostDirListArgsRelease {
     }
 }
 
-/// Arguments for Host.env_is_windows!
-/// Roc signature: Str => Bool
+/// Arguments for Host.env_current_arch_os!
+/// Roc signature: Str => { arch : Str, os : Str }
 /// Refcounted fields are owned by the hosted function.
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct HostEnvIsWindowsArgs {
+pub struct HostEnvCurrentArchOsArgs {
     pub arg0: RocStr,
 }
 
@@ -10179,6 +10211,15 @@ pub struct HostEnvExePathWindowsArgs {
     pub arg0: RocStr,
 }
 
+/// Arguments for Host.env_is_windows!
+/// Roc signature: Str => Bool
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostEnvIsWindowsArgs {
+    pub arg0: RocStr,
+}
+
 /// Arguments for Host.env_temp_dir!
 /// Roc signature: Str => { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }
 /// Refcounted fields are owned by the hosted function.
@@ -10195,15 +10236,6 @@ pub struct HostEnvTempDirArgs {
 #[derive(Clone, Copy)]
 pub struct HostEnvVarArgs {
     pub arg0: UnixBytesOrUtf8OrWindowsU16s,
-}
-
-/// Arguments for Host.env_current_arch_os!
-/// Roc signature: Str => { arch : Str, os : Str }
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostEnvCurrentArchOsArgs {
-    pub arg0: RocStr,
 }
 
 /// Arguments for Host.file_delete!
@@ -10472,6 +10504,16 @@ unsafe impl RocRelease<HostFileIsWritableArgs> for HostFileIsWritableArgsRelease
     }
 }
 
+/// Arguments for Host.file_open_reader!
+/// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }, U64 => Try(Host.FileReader, [FileErr(IOErr)])
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostFileOpenReaderArgs {
+    pub arg0: AnonStruct2e21b53659f79626,
+    pub arg1: u64,
+}
+
 /// Arguments for Host.file_read_bytes!
 /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) } => Try(List(U8), [FileErr(IOErr)])
 /// Refcounted fields are owned by the hosted function.
@@ -10534,6 +10576,35 @@ unsafe impl RocRelease<HostFileReadBytesArgs> for HostFileReadBytesArgsRelease {
     unsafe fn release(value: HostFileReadBytesArgs, roc_host: &RocHost) {
         unsafe { value.decref(roc_host); }
     }
+}
+
+/// Arguments for Host.file_read_exactly!
+/// Roc signature: Host.FileReader, U64 => Try(List(U8), [FileErr(IOErr), FileUnexpectedEOF])
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostFileReadExactlyArgs {
+    pub arg0: *mut u64,
+    pub arg1: u64,
+}
+
+/// Arguments for Host.file_read_line!
+/// Roc signature: Host.FileReader => Try(List(U8), [FileErr(IOErr)])
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostFileReadLineArgs {
+    pub arg0: *mut u64,
+}
+
+/// Arguments for Host.file_read_up_to!
+/// Roc signature: Host.FileReader, U64 => Try(List(U8), [FileErr(IOErr)])
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostFileReadUpToArgs {
+    pub arg0: *mut u64,
+    pub arg1: u64,
 }
 
 /// Arguments for Host.file_read_utf8!
@@ -10600,6 +10671,25 @@ unsafe impl RocRelease<HostFileReadUtf8Args> for HostFileReadUtf8ArgsRelease {
     }
 }
 
+/// Arguments for Host.file_reader_position!
+/// Roc signature: Host.FileReader => Try(U64, [FileErr(IOErr)])
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostFileReaderPositionArgs {
+    pub arg0: *mut u64,
+}
+
+/// Arguments for Host.file_reader_seek!
+/// Roc signature: Host.FileReader, [Current(I64), End(I64), Start(U64)] => Try(U64, [FileErr(IOErr)])
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostFileReaderSeekArgs {
+    pub arg0: *mut u64,
+    pub arg1: CurrentOrEndOrStart,
+}
+
 /// Arguments for Host.file_rename!
 /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }, { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) } => Try({}, [FileErr(IOErr)])
 /// Refcounted fields are owned by the hosted function.
@@ -10608,6 +10698,16 @@ unsafe impl RocRelease<HostFileReadUtf8Args> for HostFileReadUtf8ArgsRelease {
 pub struct HostFileRenameArgs {
     pub arg0: AnonStruct2e21b53659f79626,
     pub arg1: AnonStruct2e21b53659f79626,
+}
+
+/// Arguments for Host.file_set_len!
+/// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }, U64 => Try({}, [FileErr(IOErr)])
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostFileSetLenArgs {
+    pub arg0: AnonStruct2e21b53659f79626,
+    pub arg1: u64,
 }
 
 /// Arguments for Host.file_size_in_bytes!
@@ -10866,6 +10966,16 @@ unsafe impl RocRelease<HostFileTimeModifiedArgs> for HostFileTimeModifiedArgsRel
     }
 }
 
+/// Arguments for Host.file_write_bytes!
+/// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }, List(U8) => Try({}, [FileErr(IOErr)])
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostFileWriteBytesArgs {
+    pub arg0: AnonStruct2e21b53659f79626,
+    pub arg1: RocListWith<u8, false>,
+}
+
 /// Arguments for Host.file_write_bytes_at!
 /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }, U64, List(U8) => Try({}, [FileErr(IOErr)])
 /// Refcounted fields are owned by the hosted function.
@@ -10877,26 +10987,6 @@ pub struct HostFileWriteBytesAtArgs {
     pub arg2: RocListWith<u8, false>,
 }
 
-/// Arguments for Host.file_set_len!
-/// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }, U64 => Try({}, [FileErr(IOErr)])
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostFileSetLenArgs {
-    pub arg0: AnonStruct2e21b53659f79626,
-    pub arg1: u64,
-}
-
-/// Arguments for Host.file_write_bytes!
-/// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }, List(U8) => Try({}, [FileErr(IOErr)])
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostFileWriteBytesArgs {
-    pub arg0: AnonStruct2e21b53659f79626,
-    pub arg1: RocListWith<u8, false>,
-}
-
 /// Arguments for Host.file_write_utf8!
 /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }, Str => Try({}, [FileErr(IOErr)])
 /// Refcounted fields are owned by the hosted function.
@@ -10905,260 +10995,6 @@ pub struct HostFileWriteBytesArgs {
 pub struct HostFileWriteUtf8Args {
     pub arg0: AnonStruct2e21b53659f79626,
     pub arg1: RocStr,
-}
-
-/// Arguments for Host.path_type!
-/// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) } => Try({ is_dir : Bool, is_file : Bool, is_sym_link : Bool }, IOErr)
-/// Refcounted fields are owned by the hosted function.
-#[cfg(target_pointer_width = "32")]
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostPathTypeArgs {
-    pub unix_bytes: RocListWith<u8, false>,
-    pub windows_u16s: RocListWith<u16, false>,
-    pub is_windows: bool,
-}
-
-/// Arguments for Host.path_type!
-/// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) } => Try({ is_dir : Bool, is_file : Bool, is_sym_link : Bool }, IOErr)
-/// Refcounted fields are owned by the hosted function.
-#[cfg(not(target_pointer_width = "32"))]
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostPathTypeArgs {
-    pub unix_bytes: RocListWith<u8, false>,
-    pub windows_u16s: RocListWith<u16, false>,
-    pub is_windows: bool,
-}
-
-#[cfg(target_pointer_width = "64")]
-const _: () = assert!(core::mem::size_of::<HostPathTypeArgs>() == 56, "HostPathTypeArgs size mismatch");
-#[cfg(target_pointer_width = "64")]
-const _: () = assert!(core::mem::align_of::<HostPathTypeArgs>() == 8, "HostPathTypeArgs alignment mismatch");
-#[cfg(target_pointer_width = "32")]
-const _: () = assert!(core::mem::size_of::<HostPathTypeArgs>() == 28, "HostPathTypeArgs size mismatch");
-#[cfg(target_pointer_width = "32")]
-const _: () = assert!(core::mem::align_of::<HostPathTypeArgs>() == 4, "HostPathTypeArgs alignment mismatch");
-
-impl HostPathTypeArgs {
-    /// Recursively decrement Roc-owned fields.
-    ///
-    /// # Safety
-    /// `self` must own one live Roc reference for each refcounted field.
-    pub unsafe fn decref(self, roc_host: &RocHost) {
-        let value = self;
-        unsafe { value.unix_bytes.decref(roc_host); }
-        unsafe { value.windows_u16s.decref(roc_host); }
-    }
-
-    /// Increment Roc-owned fields.
-    ///
-    /// # Safety
-    /// `self` must point at live Roc allocations. The retained references must
-    /// be balanced by later decrefs.
-    pub unsafe fn incref(self, amount: isize) {
-        let value = self;
-        unsafe { value.unix_bytes.incref(amount); }
-        unsafe { value.windows_u16s.incref(amount); }
-    }
-}
-
-pub struct HostPathTypeArgsRelease;
-
-unsafe impl RocRelease<HostPathTypeArgs> for HostPathTypeArgsRelease {
-    unsafe fn release(value: HostPathTypeArgs, roc_host: &RocHost) {
-        unsafe { value.decref(roc_host); }
-    }
-}
-
-/// Arguments for Host.stdout_line!
-/// Roc signature: Str => Try({}, [StdoutErr(IOErr)])
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostStdoutLineArgs {
-    pub arg0: RocStr,
-}
-
-/// Arguments for Host.stdout_write!
-/// Roc signature: Str => Try({}, [StdoutErr(IOErr)])
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostStdoutWriteArgs {
-    pub arg0: RocStr,
-}
-
-/// Arguments for Host.stdout_write_bytes!
-/// Roc signature: List(U8) => Try({}, [StdoutErr(IOErr)])
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostStdoutWriteBytesArgs {
-    pub arg0: RocListWith<u8, false>,
-}
-
-/// Arguments for Host.stderr_line!
-/// Roc signature: Str => Try({}, [StderrErr(IOErr)])
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostStderrLineArgs {
-    pub arg0: RocStr,
-}
-
-/// Arguments for Host.stderr_write!
-/// Roc signature: Str => Try({}, [StderrErr(IOErr)])
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostStderrWriteArgs {
-    pub arg0: RocStr,
-}
-
-/// Arguments for Host.stderr_write_bytes!
-/// Roc signature: List(U8) => Try({}, [StderrErr(IOErr)])
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostStderrWriteBytesArgs {
-    pub arg0: RocListWith<u8, false>,
-}
-
-/// Arguments for Host.sqlite_open!
-/// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }, U64, U64, U64, U64, I64, I64 => Try(Host.SqliteDb, { code : I64, message : Str })
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostSqliteOpenArgs {
-    pub arg0: AnonStruct2e21b53659f79626,
-    pub arg1: u64,
-    pub arg2: u64,
-    pub arg3: u64,
-    pub arg4: u64,
-    pub arg5: i64,
-    pub arg6: i64,
-}
-
-/// Arguments for Host.sqlite_prepare!
-/// Roc signature: Host.SqliteDb, Str => Try(Host.SqliteStmt, { code : I64, message : Str })
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostSqlitePrepareArgs {
-    pub arg0: *mut u64,
-    pub arg1: RocStr,
-}
-
-/// Arguments for Host.sqlite_start!
-/// Roc signature: Host.SqliteStmt, List({ name : Str, value : [Bytes(List(U8)), Integer(I64), Null, Real(F64), String(Str)] }), U64 => Try(Host.SqliteExec, { code : I64, message : Str })
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostSqliteStartArgs {
-    pub arg0: *mut u64,
-    pub arg1: RocList<AnonStruct2782504baf739389>,
-    pub arg2: u64,
-}
-
-/// Arguments for Host.sqlite_columns!
-/// Roc signature: Host.SqliteStmt => Try(List(Str), { code : I64, message : Str })
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostSqliteColumnsArgs {
-    pub arg0: *mut u64,
-}
-
-/// Arguments for Host.sqlite_next_row!
-/// Roc signature: Host.SqliteExec, U64, Bool => Try([Done, ResultTooLarge, Row({ bytes : U64, values : List([Bytes(List(U8)), Integer(I64), Null, Real(F64), String(Str)]) }), RowLimitExceeded], { code : I64, message : Str })
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostSqliteNextRowArgs {
-    pub arg0: *mut u64,
-    pub arg1: u64,
-    pub arg2: bool,
-}
-
-/// Arguments for Host.sqlite_begin!
-/// Roc signature: Host.SqliteDb, I64 => Try(Host.SqliteTxn, { code : I64, message : Str })
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostSqliteBeginArgs {
-    pub arg0: *mut u64,
-    pub arg1: i64,
-}
-
-/// Arguments for Host.sqlite_txn_prepare!
-/// Roc signature: Host.SqliteTxn, Str => Try(Host.SqliteStmt, { code : I64, message : Str })
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostSqliteTxnPrepareArgs {
-    pub arg0: *mut u64,
-    pub arg1: RocStr,
-}
-
-/// Arguments for Host.sqlite_txn_finish!
-/// Roc signature: Host.SqliteTxn, Bool => Try({}, { code : I64, message : Str })
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostSqliteTxnFinishArgs {
-    pub arg0: *mut u64,
-    pub arg1: bool,
-}
-
-/// Arguments for Host.tcp_connect!
-/// Roc signature: Str, U16 => Try(Host.TcpStream, Str)
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostTcpConnectArgs {
-    pub arg0: RocStr,
-    pub arg1: u16,
-}
-
-/// Arguments for Host.tcp_read_up_to!
-/// Roc signature: Host.TcpStream, U64 => Try(List(U8), Str)
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostTcpReadUpToArgs {
-    pub arg0: *mut u64,
-    pub arg1: u64,
-}
-
-/// Arguments for Host.tcp_read_exactly!
-/// Roc signature: Host.TcpStream, U64 => Try(List(U8), Str)
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostTcpReadExactlyArgs {
-    pub arg0: *mut u64,
-    pub arg1: u64,
-}
-
-/// Arguments for Host.tcp_read_until!
-/// Roc signature: Host.TcpStream, U8 => Try(List(U8), Str)
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostTcpReadUntilArgs {
-    pub arg0: *mut u64,
-    pub arg1: u8,
-}
-
-/// Arguments for Host.tcp_write!
-/// Roc signature: Host.TcpStream, List(U8) => Try({}, Str)
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostTcpWriteArgs {
-    pub arg0: *mut u64,
-    pub arg1: RocListWith<u8, false>,
 }
 
 /// Arguments for Host.http_send_request!
@@ -11237,71 +11073,87 @@ unsafe impl RocRelease<HostHttpSendRequestArgs> for HostHttpSendRequestArgsRelea
     }
 }
 
-/// Arguments for Host.file_open_reader!
-/// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }, U64 => Try(Host.FileReader, [FileErr(IOErr)])
+/// Arguments for Host.path_type!
+/// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) } => Try({ is_dir : Bool, is_file : Bool, is_sym_link : Bool }, IOErr)
 /// Refcounted fields are owned by the hosted function.
+#[cfg(target_pointer_width = "32")]
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct HostFileOpenReaderArgs {
-    pub arg0: AnonStruct2e21b53659f79626,
-    pub arg1: u64,
+pub struct HostPathTypeArgs {
+    pub unix_bytes: RocListWith<u8, false>,
+    pub windows_u16s: RocListWith<u16, false>,
+    pub is_windows: bool,
 }
 
-/// Arguments for Host.file_read_line!
-/// Roc signature: Host.FileReader => Try(List(U8), [FileErr(IOErr)])
+/// Arguments for Host.path_type!
+/// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) } => Try({ is_dir : Bool, is_file : Bool, is_sym_link : Bool }, IOErr)
+/// Refcounted fields are owned by the hosted function.
+#[cfg(not(target_pointer_width = "32"))]
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostPathTypeArgs {
+    pub unix_bytes: RocListWith<u8, false>,
+    pub windows_u16s: RocListWith<u16, false>,
+    pub is_windows: bool,
+}
+
+#[cfg(target_pointer_width = "64")]
+const _: () = assert!(core::mem::size_of::<HostPathTypeArgs>() == 56, "HostPathTypeArgs size mismatch");
+#[cfg(target_pointer_width = "64")]
+const _: () = assert!(core::mem::align_of::<HostPathTypeArgs>() == 8, "HostPathTypeArgs alignment mismatch");
+#[cfg(target_pointer_width = "32")]
+const _: () = assert!(core::mem::size_of::<HostPathTypeArgs>() == 28, "HostPathTypeArgs size mismatch");
+#[cfg(target_pointer_width = "32")]
+const _: () = assert!(core::mem::align_of::<HostPathTypeArgs>() == 4, "HostPathTypeArgs alignment mismatch");
+
+impl HostPathTypeArgs {
+    /// Recursively decrement Roc-owned fields.
+    ///
+    /// # Safety
+    /// `self` must own one live Roc reference for each refcounted field.
+    pub unsafe fn decref(self, roc_host: &RocHost) {
+        let value = self;
+        unsafe { value.unix_bytes.decref(roc_host); }
+        unsafe { value.windows_u16s.decref(roc_host); }
+    }
+
+    /// Increment Roc-owned fields.
+    ///
+    /// # Safety
+    /// `self` must point at live Roc allocations. The retained references must
+    /// be balanced by later decrefs.
+    pub unsafe fn incref(self, amount: isize) {
+        let value = self;
+        unsafe { value.unix_bytes.incref(amount); }
+        unsafe { value.windows_u16s.incref(amount); }
+    }
+}
+
+pub struct HostPathTypeArgsRelease;
+
+unsafe impl RocRelease<HostPathTypeArgs> for HostPathTypeArgsRelease {
+    unsafe fn release(value: HostPathTypeArgs, roc_host: &RocHost) {
+        unsafe { value.decref(roc_host); }
+    }
+}
+
+/// Arguments for Host.readiness_create!
+/// Roc signature: Bool => Try(Host.Readiness, [ReadinessCapacityExhausted])
 /// Refcounted fields are owned by the hosted function.
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct HostFileReadLineArgs {
+pub struct HostReadinessCreateArgs {
+    pub arg0: bool,
+}
+
+/// Arguments for Host.readiness_set!
+/// Roc signature: Host.Readiness, Bool => Try({}, [InvalidReadiness, ServerStopping, StaleReadiness])
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostReadinessSetArgs {
     pub arg0: *mut u64,
-}
-
-/// Arguments for Host.file_read_up_to!
-/// Roc signature: Host.FileReader, U64 => Try(List(U8), [FileErr(IOErr)])
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostFileReadUpToArgs {
-    pub arg0: *mut u64,
-    pub arg1: u64,
-}
-
-/// Arguments for Host.file_read_exactly!
-/// Roc signature: Host.FileReader, U64 => Try(List(U8), [FileErr(IOErr), FileUnexpectedEOF])
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostFileReadExactlyArgs {
-    pub arg0: *mut u64,
-    pub arg1: u64,
-}
-
-/// Arguments for Host.file_reader_position!
-/// Roc signature: Host.FileReader => Try(U64, [FileErr(IOErr)])
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostFileReaderPositionArgs {
-    pub arg0: *mut u64,
-}
-
-/// Arguments for Host.file_reader_seek!
-/// Roc signature: Host.FileReader, [Current(I64), End(I64), Start(U64)] => Try(U64, [FileErr(IOErr)])
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostFileReaderSeekArgs {
-    pub arg0: *mut u64,
-    pub arg1: CurrentOrEndOrStart,
-}
-
-/// Arguments for Host.sleep_millis!
-/// Roc signature: U64 => {}
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostSleepMillisArgs {
-    pub arg0: u64,
+    pub arg1: bool,
 }
 
 /// Arguments for Host.request_body_read!
@@ -11324,57 +11176,6 @@ pub struct HostRequestBodyReadAllArgs {
     pub arg1: u64,
 }
 
-/// Arguments for Host.crypt_sha1!
-/// Roc signature: List(U8) => Str
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostCryptSha1Args {
-    pub arg0: RocListWith<u8, false>,
-}
-
-/// Arguments for Host.crypt_encrypt_aes256_gcm!
-/// Roc signature: List(U8), List(U8), List(U8) => Try({ auth_tag : List(U8), ciphertext : List(U8) }, [CryptoErr(Str)])
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostCryptEncryptAes256GcmArgs {
-    pub arg0: RocListWith<u8, false>,
-    pub arg1: RocListWith<u8, false>,
-    pub arg2: RocListWith<u8, false>,
-}
-
-/// Arguments for Host.crypt_decrypt_aes256_gcm!
-/// Roc signature: List(U8), List(U8), List(U8), List(U8) => Try(List(U8), [CryptoErr(Str)])
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostCryptDecryptAes256GcmArgs {
-    pub arg0: RocListWith<u8, false>,
-    pub arg1: RocListWith<u8, false>,
-    pub arg2: RocListWith<u8, false>,
-    pub arg3: RocListWith<u8, false>,
-}
-
-/// Arguments for Host.readiness_create!
-/// Roc signature: Bool => Try(Host.Readiness, [ReadinessCapacityExhausted])
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostReadinessCreateArgs {
-    pub arg0: bool,
-}
-
-/// Arguments for Host.readiness_set!
-/// Roc signature: Host.Readiness, Bool => Try({}, [InvalidReadiness, ServerStopping, StaleReadiness])
-/// Refcounted fields are owned by the hosted function.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct HostReadinessSetArgs {
-    pub arg0: *mut u64,
-    pub arg1: bool,
-}
-
 /// Arguments for Host.request_body_write_file!
 /// Roc signature: Host.RequestBody, U64, Str, Str, U8 => Try({ bytes_written : U64, digest : [NotComputed, Sha256Digest(List(U8))] }, [Cancelled, CleanupFailed(Str), ClientDisconnected, ConcurrentRead, DestinationExists, Filesystem(Str), InvalidBody(Str), InvalidRelativeFile, InvalidRoot, PermissionDenied, PublishFailed(Str), RequestFinished, Saturated, Stopping, StorageFull, Timeout, TooLarge({ limit_bytes : U64, received_at_least : U64 })])
 /// Refcounted fields are owned by the hosted function.
@@ -11386,6 +11187,205 @@ pub struct HostRequestBodyWriteFileArgs {
     pub arg2: RocStr,
     pub arg3: RocStr,
     pub arg4: u8,
+}
+
+/// Arguments for Host.sleep_millis!
+/// Roc signature: U64 => {}
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostSleepMillisArgs {
+    pub arg0: u64,
+}
+
+/// Arguments for Host.sqlite_begin!
+/// Roc signature: Host.SqliteDb, I64 => Try(Host.SqliteTxn, { code : I64, message : Str })
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostSqliteBeginArgs {
+    pub arg0: *mut u64,
+    pub arg1: i64,
+}
+
+/// Arguments for Host.sqlite_columns!
+/// Roc signature: Host.SqliteStmt => Try(List(Str), { code : I64, message : Str })
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostSqliteColumnsArgs {
+    pub arg0: *mut u64,
+}
+
+/// Arguments for Host.sqlite_next_row!
+/// Roc signature: Host.SqliteExec, U64, Bool => Try([Done, ResultTooLarge, Row({ bytes : U64, values : List([Bytes(List(U8)), Integer(I64), Null, Real(F64), String(Str)]) }), RowLimitExceeded], { code : I64, message : Str })
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostSqliteNextRowArgs {
+    pub arg0: *mut u64,
+    pub arg1: u64,
+    pub arg2: bool,
+}
+
+/// Arguments for Host.sqlite_open!
+/// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }, U64, U64, U64, U64, I64, I64 => Try(Host.SqliteDb, { code : I64, message : Str })
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostSqliteOpenArgs {
+    pub arg0: AnonStruct2e21b53659f79626,
+    pub arg1: u64,
+    pub arg2: u64,
+    pub arg3: u64,
+    pub arg4: u64,
+    pub arg5: i64,
+    pub arg6: i64,
+}
+
+/// Arguments for Host.sqlite_prepare!
+/// Roc signature: Host.SqliteDb, Str => Try(Host.SqliteStmt, { code : I64, message : Str })
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostSqlitePrepareArgs {
+    pub arg0: *mut u64,
+    pub arg1: RocStr,
+}
+
+/// Arguments for Host.sqlite_start!
+/// Roc signature: Host.SqliteStmt, List({ name : Str, value : [Bytes(List(U8)), Integer(I64), Null, Real(F64), String(Str)] }), U64 => Try(Host.SqliteExec, { code : I64, message : Str })
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostSqliteStartArgs {
+    pub arg0: *mut u64,
+    pub arg1: RocList<AnonStruct2782504baf739389>,
+    pub arg2: u64,
+}
+
+/// Arguments for Host.sqlite_txn_finish!
+/// Roc signature: Host.SqliteTxn, Bool => Try({}, { code : I64, message : Str })
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostSqliteTxnFinishArgs {
+    pub arg0: *mut u64,
+    pub arg1: bool,
+}
+
+/// Arguments for Host.sqlite_txn_prepare!
+/// Roc signature: Host.SqliteTxn, Str => Try(Host.SqliteStmt, { code : I64, message : Str })
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostSqliteTxnPrepareArgs {
+    pub arg0: *mut u64,
+    pub arg1: RocStr,
+}
+
+/// Arguments for Host.stderr_line!
+/// Roc signature: Str => Try({}, [StderrErr(IOErr)])
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostStderrLineArgs {
+    pub arg0: RocStr,
+}
+
+/// Arguments for Host.stderr_write!
+/// Roc signature: Str => Try({}, [StderrErr(IOErr)])
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostStderrWriteArgs {
+    pub arg0: RocStr,
+}
+
+/// Arguments for Host.stderr_write_bytes!
+/// Roc signature: List(U8) => Try({}, [StderrErr(IOErr)])
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostStderrWriteBytesArgs {
+    pub arg0: RocListWith<u8, false>,
+}
+
+/// Arguments for Host.stdout_line!
+/// Roc signature: Str => Try({}, [StdoutErr(IOErr)])
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostStdoutLineArgs {
+    pub arg0: RocStr,
+}
+
+/// Arguments for Host.stdout_write!
+/// Roc signature: Str => Try({}, [StdoutErr(IOErr)])
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostStdoutWriteArgs {
+    pub arg0: RocStr,
+}
+
+/// Arguments for Host.stdout_write_bytes!
+/// Roc signature: List(U8) => Try({}, [StdoutErr(IOErr)])
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostStdoutWriteBytesArgs {
+    pub arg0: RocListWith<u8, false>,
+}
+
+/// Arguments for Host.tcp_connect!
+/// Roc signature: Str, U16 => Try(Host.TcpStream, Str)
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostTcpConnectArgs {
+    pub arg0: RocStr,
+    pub arg1: u16,
+}
+
+/// Arguments for Host.tcp_read_exactly!
+/// Roc signature: Host.TcpStream, U64 => Try(List(U8), Str)
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostTcpReadExactlyArgs {
+    pub arg0: *mut u64,
+    pub arg1: u64,
+}
+
+/// Arguments for Host.tcp_read_until!
+/// Roc signature: Host.TcpStream, U8 => Try(List(U8), Str)
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostTcpReadUntilArgs {
+    pub arg0: *mut u64,
+    pub arg1: u8,
+}
+
+/// Arguments for Host.tcp_read_up_to!
+/// Roc signature: Host.TcpStream, U64 => Try(List(U8), Str)
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostTcpReadUpToArgs {
+    pub arg0: *mut u64,
+    pub arg1: u64,
+}
+
+/// Arguments for Host.tcp_write!
+/// Roc signature: Host.TcpStream, List(U8) => Try({}, Str)
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostTcpWriteArgs {
+    pub arg0: *mut u64,
+    pub arg1: RocListWith<u8, false>,
 }
 
 // Platform Type Aliases
@@ -11416,6 +11416,7 @@ pub type HostCmdExecOutputOk = AnonStruct3e7554e024207e25;
 pub type FailedToGetExitCodeOrNonZeroExitCodeOrSaturatedOrStderrTooLargeOrStdoutTooLargeOrTimeoutNonZeroExitCode = AnonStruct3f89ee1e14924626;
 pub type FailedToGetExitCodeOrNonZeroExitCodeOrSaturatedOrStderrTooLargeOrStdoutTooLargeOrTimeoutStderrTooLarge = AnonStruct3c19acd0e825703f;
 pub type FailedToGetExitCodeOrNonZeroExitCodeOrSaturatedOrStderrTooLargeOrStdoutTooLargeOrTimeoutStdoutTooLarge = AnonStruct3c19acd0e825703f;
+pub type HostCryptEncryptAes256GcmOk = AnonStruct7888c40338892024;
 pub type HostDirCreateArg0 = AnonStruct2e21b53659f79626;
 pub type HostDirCreateAllArg0 = AnonStruct2e21b53659f79626;
 pub type HostDirCreateAllResult = HostDirCreateResult;
@@ -11431,6 +11432,8 @@ pub type HostDirDeleteEmptyResultPayload = HostDirCreateResultPayload;
 pub type HostDirDeleteEmptyResultTag = HostDirCreateResultTag;
 pub type HostDirListArg0 = AnonStruct2e21b53659f79626;
 pub type HostDirListOk = AnonStruct2e21b53659f79626;
+pub type HostEnvCurrentArchOs = AnonStructB635699b1cbc809a;
+pub type HostEnvDict = AnonStruct4028312a23fce46c;
 pub type HostEnvExePathUnixResult = HostEnvCwdUnixResult;
 pub type HostEnvExePathUnixResultPayload = HostEnvCwdUnixResultPayload;
 pub type HostEnvExePathUnixResultTag = HostEnvCwdUnixResultTag;
@@ -11450,8 +11453,6 @@ pub type HostEnvVarOkTag = UnixBytesOrUtf8OrWindowsU16sTag;
 pub type EnvErrOrVarNotFoundVarNotFound = UnixBytesOrUtf8OrWindowsU16s;
 pub type EnvErrOrVarNotFoundVarNotFoundPayload = UnixBytesOrUtf8OrWindowsU16sPayload;
 pub type EnvErrOrVarNotFoundVarNotFoundTag = UnixBytesOrUtf8OrWindowsU16sTag;
-pub type HostEnvDict = AnonStruct4028312a23fce46c;
-pub type HostEnvCurrentArchOs = AnonStructB635699b1cbc809a;
 pub type HostFileDeleteArg0 = AnonStruct2e21b53659f79626;
 pub type HostFileHardLinkArg0 = AnonStruct2e21b53659f79626;
 pub type HostFileHardLinkArg1 = AnonStruct2e21b53659f79626;
@@ -11467,14 +11468,34 @@ pub type HostFileIsWritableArg0 = AnonStruct2e21b53659f79626;
 pub type HostFileIsWritableResult = HostFileIsExecutableResult;
 pub type HostFileIsWritableResultPayload = HostFileIsExecutableResultPayload;
 pub type HostFileIsWritableResultTag = HostFileIsExecutableResultTag;
+pub type HostFileOpenReaderArg0 = AnonStruct2e21b53659f79626;
 pub type HostFileReadBytesArg0 = AnonStruct2e21b53659f79626;
+pub type HostFileReadExactlyErr = FileErrOrFileUnexpectedEOF;
+pub type HostFileReadExactlyErrPayload = FileErrOrFileUnexpectedEOFPayload;
+pub type HostFileReadExactlyErrTag = FileErrOrFileUnexpectedEOFTag;
+pub type HostFileReadLineResult = HostFileReadBytesResult;
+pub type HostFileReadLineResultPayload = HostFileReadBytesResultPayload;
+pub type HostFileReadLineResultTag = HostFileReadBytesResultTag;
+pub type HostFileReadUpToResult = HostFileReadBytesResult;
+pub type HostFileReadUpToResultPayload = HostFileReadBytesResultPayload;
+pub type HostFileReadUpToResultTag = HostFileReadBytesResultTag;
 pub type HostFileReadUtf8Arg0 = AnonStruct2e21b53659f79626;
+pub type HostFileReaderSeekResult = HostFileReaderPositionResult;
+pub type HostFileReaderSeekResultPayload = HostFileReaderPositionResultPayload;
+pub type HostFileReaderSeekResultTag = HostFileReaderPositionResultTag;
 pub type HostFileRenameArg0 = AnonStruct2e21b53659f79626;
 pub type HostFileRenameArg1 = AnonStruct2e21b53659f79626;
 pub type HostFileRenameResult = HostFileDeleteResult;
 pub type HostFileRenameResultPayload = HostFileDeleteResultPayload;
 pub type HostFileRenameResultTag = HostFileDeleteResultTag;
+pub type HostFileSetLenArg0 = AnonStruct2e21b53659f79626;
+pub type HostFileSetLenResult = HostFileDeleteResult;
+pub type HostFileSetLenResultPayload = HostFileDeleteResultPayload;
+pub type HostFileSetLenResultTag = HostFileDeleteResultTag;
 pub type HostFileSizeInBytesArg0 = AnonStruct2e21b53659f79626;
+pub type HostFileSizeInBytesResult = HostFileReaderPositionResult;
+pub type HostFileSizeInBytesResultPayload = HostFileReaderPositionResultPayload;
+pub type HostFileSizeInBytesResultTag = HostFileReaderPositionResultTag;
 pub type HostFileTimeAccessedArg0 = AnonStruct2e21b53659f79626;
 pub type HostFileTimeCreatedArg0 = AnonStruct2e21b53659f79626;
 pub type HostFileTimeCreatedResult = HostFileTimeAccessedResult;
@@ -11484,63 +11505,18 @@ pub type HostFileTimeModifiedArg0 = AnonStruct2e21b53659f79626;
 pub type HostFileTimeModifiedResult = HostFileTimeAccessedResult;
 pub type HostFileTimeModifiedResultPayload = HostFileTimeAccessedResultPayload;
 pub type HostFileTimeModifiedResultTag = HostFileTimeAccessedResultTag;
-pub type HostFileWriteBytesAtArg0 = AnonStruct2e21b53659f79626;
-pub type HostFileWriteBytesAtResult = HostFileDeleteResult;
-pub type HostFileWriteBytesAtResultPayload = HostFileDeleteResultPayload;
-pub type HostFileWriteBytesAtResultTag = HostFileDeleteResultTag;
-pub type HostFileSetLenArg0 = AnonStruct2e21b53659f79626;
-pub type HostFileSetLenResult = HostFileDeleteResult;
-pub type HostFileSetLenResultPayload = HostFileDeleteResultPayload;
-pub type HostFileSetLenResultTag = HostFileDeleteResultTag;
 pub type HostFileWriteBytesArg0 = AnonStruct2e21b53659f79626;
 pub type HostFileWriteBytesResult = HostFileDeleteResult;
 pub type HostFileWriteBytesResultPayload = HostFileDeleteResultPayload;
 pub type HostFileWriteBytesResultTag = HostFileDeleteResultTag;
+pub type HostFileWriteBytesAtArg0 = AnonStruct2e21b53659f79626;
+pub type HostFileWriteBytesAtResult = HostFileDeleteResult;
+pub type HostFileWriteBytesAtResultPayload = HostFileDeleteResultPayload;
+pub type HostFileWriteBytesAtResultTag = HostFileDeleteResultTag;
 pub type HostFileWriteUtf8Arg0 = AnonStruct2e21b53659f79626;
 pub type HostFileWriteUtf8Result = HostFileDeleteResult;
 pub type HostFileWriteUtf8ResultPayload = HostFileDeleteResultPayload;
 pub type HostFileWriteUtf8ResultTag = HostFileDeleteResultTag;
-pub type HostPathTypeArg0 = AnonStruct2e21b53659f79626;
-pub type HostPathTypeOk = AnonStruct8dfa7f17f2083a52;
-pub type HostStdoutWriteResult = HostStdoutLineResult;
-pub type HostStdoutWriteResultPayload = HostStdoutLineResultPayload;
-pub type HostStdoutWriteResultTag = HostStdoutLineResultTag;
-pub type HostStdoutWriteBytesResult = HostStdoutLineResult;
-pub type HostStdoutWriteBytesResultPayload = HostStdoutLineResultPayload;
-pub type HostStdoutWriteBytesResultTag = HostStdoutLineResultTag;
-pub type HostStderrWriteResult = HostStderrLineResult;
-pub type HostStderrWriteResultPayload = HostStderrLineResultPayload;
-pub type HostStderrWriteResultTag = HostStderrLineResultTag;
-pub type HostStderrWriteBytesResult = HostStderrLineResult;
-pub type HostStderrWriteBytesResultPayload = HostStderrLineResultPayload;
-pub type HostStderrWriteBytesResultTag = HostStderrLineResultTag;
-pub type HostSqliteOpenArg0 = AnonStruct2e21b53659f79626;
-pub type HostSqliteOpenErr = AnonStruct22cf486058afc711;
-pub type HostSqlitePrepareErr = AnonStruct22cf486058afc711;
-pub type HostSqliteStartArg1 = AnonStruct2782504baf739389;
-pub type HostSqliteStartErr = AnonStruct22cf486058afc711;
-pub type HostSqliteColumnsErr = AnonStruct22cf486058afc711;
-pub type HostSqliteNextRowErr = AnonStruct22cf486058afc711;
-pub type HostSqliteNextRowOk = DoneOrResultTooLargeOrRowOrRowLimitExceeded;
-pub type HostSqliteNextRowOkPayload = DoneOrResultTooLargeOrRowOrRowLimitExceededPayload;
-pub type HostSqliteNextRowOkTag = DoneOrResultTooLargeOrRowOrRowLimitExceededTag;
-pub type HostSqliteNextRowOkRow = AnonStruct6020798da82f3849;
-pub type DoneOrResultTooLargeOrRowOrRowLimitExceededRow = AnonStruct6020798da82f3849;
-pub type DoneOrResultTooLargeOrRowOrRowLimitExceededRowValues = BytesOrIntegerOrNullOrRealOrString;
-pub type DoneOrResultTooLargeOrRowOrRowLimitExceededRowValuesPayload = BytesOrIntegerOrNullOrRealOrStringPayload;
-pub type DoneOrResultTooLargeOrRowOrRowLimitExceededRowValuesTag = BytesOrIntegerOrNullOrRealOrStringTag;
-pub type HostSqliteBeginErr = AnonStruct22cf486058afc711;
-pub type HostSqliteTxnPrepareResult = HostSqlitePrepareResult;
-pub type HostSqliteTxnPrepareResultPayload = HostSqlitePrepareResultPayload;
-pub type HostSqliteTxnPrepareResultTag = HostSqlitePrepareResultTag;
-pub type HostSqliteTxnPrepareErr = AnonStruct22cf486058afc711;
-pub type HostSqliteTxnFinishErr = AnonStruct22cf486058afc711;
-pub type HostTcpReadExactlyResult = HostTcpReadUpToResult;
-pub type HostTcpReadExactlyResultPayload = HostTcpReadUpToResultPayload;
-pub type HostTcpReadExactlyResultTag = HostTcpReadUpToResultTag;
-pub type HostTcpReadUntilResult = HostTcpReadUpToResult;
-pub type HostTcpReadUntilResultPayload = HostTcpReadUpToResultPayload;
-pub type HostTcpReadUntilResultTag = HostTcpReadUpToResultTag;
 pub type HostHttpSendRequestArg0 = AnonStruct85380e02323174c5;
 pub type HostHttpSendRequestArg0Headers = AnonStruct82a96c5d55d63488;
 pub type HostHttpSendRequestErr = InvalidRequestOrTransport;
@@ -11566,22 +11542,9 @@ pub type CancelledOrConnectFailedOrConnectionClosedOrDnsFailedOrExchangeFailedOr
 pub type CancelledOrConnectFailedOrConnectionClosedOrDnsFailedOrExchangeFailedOrInvalidResponseOrOtherOrResponseBodyFailedOrResponseTooLargeOrSaturatedOrTimeoutOrTlsFailedResponseTooLarge = AnonStruct3c19acd0e825703f;
 pub type CancelledOrConnectFailedOrConnectionClosedOrDnsFailedOrExchangeFailedOrInvalidResponseOrOtherOrResponseBodyFailedOrResponseTooLargeOrSaturatedOrTimeoutOrTlsFailedTlsFailed = AnonStruct773d55204b824e5d;
 pub type HostHttpSendRequestOkHeaders = AnonStruct82a96c5d55d63488;
-pub type HostFileOpenReaderArg0 = AnonStruct2e21b53659f79626;
-pub type HostFileReadLineResult = HostFileReadBytesResult;
-pub type HostFileReadLineResultPayload = HostFileReadBytesResultPayload;
-pub type HostFileReadLineResultTag = HostFileReadBytesResultTag;
-pub type HostFileReadUpToResult = HostFileReadBytesResult;
-pub type HostFileReadUpToResultPayload = HostFileReadBytesResultPayload;
-pub type HostFileReadUpToResultTag = HostFileReadBytesResultTag;
-pub type HostFileReadExactlyErr = FileErrOrFileUnexpectedEOF;
-pub type HostFileReadExactlyErrPayload = FileErrOrFileUnexpectedEOFPayload;
-pub type HostFileReadExactlyErrTag = FileErrOrFileUnexpectedEOFTag;
-pub type HostFileReaderPositionResult = HostFileSizeInBytesResult;
-pub type HostFileReaderPositionResultPayload = HostFileSizeInBytesResultPayload;
-pub type HostFileReaderPositionResultTag = HostFileSizeInBytesResultTag;
-pub type HostFileReaderSeekResult = HostFileSizeInBytesResult;
-pub type HostFileReaderSeekResultPayload = HostFileSizeInBytesResultPayload;
-pub type HostFileReaderSeekResultTag = HostFileSizeInBytesResultTag;
+pub type HostPathTypeArg0 = AnonStruct2e21b53659f79626;
+pub type HostPathTypeOk = AnonStruct8dfa7f17f2083a52;
+pub type HostReadinessSetErr = InvalidReadinessOrServerStoppingOrStaleReadiness;
 pub type HostRequestBodyReadErr = CancelledOrClientDisconnectedOrConcurrentReadOrInvalidBodyOrRequestFinishedOrStoppingOrTimeoutOrTooLarge;
 pub type HostRequestBodyReadErrPayload = CancelledOrClientDisconnectedOrConcurrentReadOrInvalidBodyOrRequestFinishedOrStoppingOrTimeoutOrTooLargePayload;
 pub type HostRequestBodyReadErrTag = CancelledOrClientDisconnectedOrConcurrentReadOrInvalidBodyOrRequestFinishedOrStoppingOrTimeoutOrTooLargeTag;
@@ -11594,14 +11557,51 @@ pub type HostRequestBodyReadAllErr = CancelledOrClientDisconnectedOrConcurrentRe
 pub type HostRequestBodyReadAllErrPayload = CancelledOrClientDisconnectedOrConcurrentReadOrInvalidBodyOrRequestFinishedOrStoppingOrTimeoutOrTooLargePayload;
 pub type HostRequestBodyReadAllErrTag = CancelledOrClientDisconnectedOrConcurrentReadOrInvalidBodyOrRequestFinishedOrStoppingOrTimeoutOrTooLargeTag;
 pub type HostRequestBodyReadAllErrTooLarge = AnonStruct3c19acd0e825703f;
-pub type HostCryptEncryptAes256GcmOk = AnonStruct7888c40338892024;
-pub type HostReadinessSetErr = InvalidReadinessOrServerStoppingOrStaleReadiness;
 pub type HostRequestBodyWriteFileErr = CancelledOrCleanupFailedOrClientDisconnectedOrConcurrentReadOrDestinationExistsOrFilesystemOrInvalidBodyOrInvalidRelativeFileOrInvalidRootOrPermissionDeniedOrPublishFailedOrRequestFinishedOrSaturatedOrStoppingOrStorageFullOrTimeoutOrTooLarge;
 pub type HostRequestBodyWriteFileErrPayload = CancelledOrCleanupFailedOrClientDisconnectedOrConcurrentReadOrDestinationExistsOrFilesystemOrInvalidBodyOrInvalidRelativeFileOrInvalidRootOrPermissionDeniedOrPublishFailedOrRequestFinishedOrSaturatedOrStoppingOrStorageFullOrTimeoutOrTooLargePayload;
 pub type HostRequestBodyWriteFileErrTag = CancelledOrCleanupFailedOrClientDisconnectedOrConcurrentReadOrDestinationExistsOrFilesystemOrInvalidBodyOrInvalidRelativeFileOrInvalidRootOrPermissionDeniedOrPublishFailedOrRequestFinishedOrSaturatedOrStoppingOrStorageFullOrTimeoutOrTooLargeTag;
 pub type HostRequestBodyWriteFileErrTooLarge = AnonStruct3c19acd0e825703f;
 pub type HostRequestBodyWriteFileOk = AnonStruct247809673488181b;
 pub type CancelledOrCleanupFailedOrClientDisconnectedOrConcurrentReadOrDestinationExistsOrFilesystemOrInvalidBodyOrInvalidRelativeFileOrInvalidRootOrPermissionDeniedOrPublishFailedOrRequestFinishedOrSaturatedOrStoppingOrStorageFullOrTimeoutOrTooLargeTooLarge = AnonStruct3c19acd0e825703f;
+pub type HostSqliteBeginErr = AnonStruct22cf486058afc711;
+pub type HostSqliteColumnsErr = AnonStruct22cf486058afc711;
+pub type HostSqliteNextRowErr = AnonStruct22cf486058afc711;
+pub type HostSqliteNextRowOk = DoneOrResultTooLargeOrRowOrRowLimitExceeded;
+pub type HostSqliteNextRowOkPayload = DoneOrResultTooLargeOrRowOrRowLimitExceededPayload;
+pub type HostSqliteNextRowOkTag = DoneOrResultTooLargeOrRowOrRowLimitExceededTag;
+pub type HostSqliteNextRowOkRow = AnonStruct6020798da82f3849;
+pub type DoneOrResultTooLargeOrRowOrRowLimitExceededRow = AnonStruct6020798da82f3849;
+pub type DoneOrResultTooLargeOrRowOrRowLimitExceededRowValues = BytesOrIntegerOrNullOrRealOrString;
+pub type DoneOrResultTooLargeOrRowOrRowLimitExceededRowValuesPayload = BytesOrIntegerOrNullOrRealOrStringPayload;
+pub type DoneOrResultTooLargeOrRowOrRowLimitExceededRowValuesTag = BytesOrIntegerOrNullOrRealOrStringTag;
+pub type HostSqliteOpenArg0 = AnonStruct2e21b53659f79626;
+pub type HostSqliteOpenErr = AnonStruct22cf486058afc711;
+pub type HostSqlitePrepareErr = AnonStruct22cf486058afc711;
+pub type HostSqliteStartArg1 = AnonStruct2782504baf739389;
+pub type HostSqliteStartErr = AnonStruct22cf486058afc711;
+pub type HostSqliteTxnFinishErr = AnonStruct22cf486058afc711;
+pub type HostSqliteTxnPrepareResult = HostSqlitePrepareResult;
+pub type HostSqliteTxnPrepareResultPayload = HostSqlitePrepareResultPayload;
+pub type HostSqliteTxnPrepareResultTag = HostSqlitePrepareResultTag;
+pub type HostSqliteTxnPrepareErr = AnonStruct22cf486058afc711;
+pub type HostStderrWriteResult = HostStderrLineResult;
+pub type HostStderrWriteResultPayload = HostStderrLineResultPayload;
+pub type HostStderrWriteResultTag = HostStderrLineResultTag;
+pub type HostStderrWriteBytesResult = HostStderrLineResult;
+pub type HostStderrWriteBytesResultPayload = HostStderrLineResultPayload;
+pub type HostStderrWriteBytesResultTag = HostStderrLineResultTag;
+pub type HostStdoutWriteResult = HostStdoutLineResult;
+pub type HostStdoutWriteResultPayload = HostStdoutLineResultPayload;
+pub type HostStdoutWriteResultTag = HostStdoutLineResultTag;
+pub type HostStdoutWriteBytesResult = HostStdoutLineResult;
+pub type HostStdoutWriteBytesResultPayload = HostStdoutLineResultPayload;
+pub type HostStdoutWriteBytesResultTag = HostStdoutLineResultTag;
+pub type HostTcpReadUntilResult = HostTcpReadExactlyResult;
+pub type HostTcpReadUntilResultPayload = HostTcpReadExactlyResultPayload;
+pub type HostTcpReadUntilResultTag = HostTcpReadExactlyResultTag;
+pub type HostTcpReadUpToResult = HostTcpReadExactlyResult;
+pub type HostTcpReadUpToResultPayload = HostTcpReadExactlyResultPayload;
+pub type HostTcpReadUpToResultTag = HostTcpReadExactlyResultTag;
 pub type InitForHostOk = AnonStruct60bc4208e250c775;
 pub type InitForHostOkConfig = AnonStruct1ff4122d63c5f5fd;
 pub type InitForHostOkConfigFileRoots = AnonStruct3b01e35488cb00dc;
@@ -11613,9 +11613,9 @@ pub type RespondForHostArg0Headers = AnonStruct82a96c5d55d63488;
 pub type InternalServerOutcomeToHostFile = AnonStruct49a217fc2950a160;
 pub type InternalServerOutcomeToHostOrdinary = AnonStruct6f3dea2f169284fc;
 pub type InternalServerOutcomeToHostOrdinaryHeaders = AnonStruct82a96c5d55d63488;
+pub type ShutdownForHostArg0 = AnonStruct628b43fd33b27733;
 pub type SseStepToHostEmitToHost = AnonStructF191bd32515026dd;
 pub type SseStepToHostWaitToHost = AnonStructFe0b1f6ac1e65458;
-pub type ShutdownForHostArg0 = AnonStruct628b43fd33b27733;
 
 // Generated Refcount Helpers
 
@@ -12824,7 +12824,7 @@ unsafe impl RocRelease<FileErrOrFileUnexpectedEOF> for FileErrOrFileUnexpectedEO
     }
 }
 
-impl HostFileSizeInBytesResult {
+impl HostFileReaderPositionResult {
     /// Recursively decrement Roc-owned payloads.
     ///
     /// # Safety
@@ -12833,11 +12833,11 @@ impl HostFileSizeInBytesResult {
         let mut value = self;
         let _ = roc_host;
         match value.tag {
-            HostFileSizeInBytesResultTag::Err => {
+            HostFileReaderPositionResultTag::Err => {
                 let payload = unsafe { value.take_payload_err_unchecked() };
                 unsafe { payload.decref(roc_host); }
             },
-            HostFileSizeInBytesResultTag::Ok => {},
+            HostFileReaderPositionResultTag::Ok => {},
         }
     }
 
@@ -12850,19 +12850,19 @@ impl HostFileSizeInBytesResult {
         let value = self;
         let _ = amount;
         match value.tag {
-            HostFileSizeInBytesResultTag::Err => {
+            HostFileReaderPositionResultTag::Err => {
                 let payload = unsafe { core::ptr::read(value.borrow_payload_err_unchecked()) };
                 unsafe { payload.incref(amount); }
             },
-            HostFileSizeInBytesResultTag::Ok => {},
+            HostFileReaderPositionResultTag::Ok => {},
         }
     }
 }
 
-pub struct HostFileSizeInBytesResultRelease;
+pub struct HostFileReaderPositionResultRelease;
 
-unsafe impl RocRelease<HostFileSizeInBytesResult> for HostFileSizeInBytesResultRelease {
-    unsafe fn release(value: HostFileSizeInBytesResult, roc_host: &RocHost) {
+unsafe impl RocRelease<HostFileReaderPositionResult> for HostFileReaderPositionResultRelease {
+    unsafe fn release(value: HostFileReaderPositionResult, roc_host: &RocHost) {
         unsafe { value.decref(roc_host); }
     }
 }
@@ -14663,7 +14663,7 @@ unsafe impl RocRelease<HostTcpConnectResult> for HostTcpConnectResultRelease {
     }
 }
 
-impl HostTcpReadUpToResult {
+impl HostTcpReadExactlyResult {
     /// Recursively decrement Roc-owned payloads.
     ///
     /// # Safety
@@ -14672,11 +14672,11 @@ impl HostTcpReadUpToResult {
         let mut value = self;
         let _ = roc_host;
         match value.tag {
-            HostTcpReadUpToResultTag::Err => {
+            HostTcpReadExactlyResultTag::Err => {
                 let payload = unsafe { value.take_payload_err_unchecked() };
                 unsafe { payload.decref(roc_host); }
             },
-            HostTcpReadUpToResultTag::Ok => {
+            HostTcpReadExactlyResultTag::Ok => {
                 let payload = unsafe { value.take_payload_ok_unchecked() };
                 unsafe { payload.decref(roc_host); }
             },
@@ -14692,11 +14692,11 @@ impl HostTcpReadUpToResult {
         let value = self;
         let _ = amount;
         match value.tag {
-            HostTcpReadUpToResultTag::Err => {
+            HostTcpReadExactlyResultTag::Err => {
                 let payload = unsafe { core::ptr::read(value.borrow_payload_err_unchecked()) };
                 unsafe { payload.incref(amount); }
             },
-            HostTcpReadUpToResultTag::Ok => {
+            HostTcpReadExactlyResultTag::Ok => {
                 let payload = unsafe { core::ptr::read(value.borrow_payload_ok_unchecked()) };
                 unsafe { payload.incref(amount); }
             },
@@ -14704,10 +14704,10 @@ impl HostTcpReadUpToResult {
     }
 }
 
-pub struct HostTcpReadUpToResultRelease;
+pub struct HostTcpReadExactlyResultRelease;
 
-unsafe impl RocRelease<HostTcpReadUpToResult> for HostTcpReadUpToResultRelease {
-    unsafe fn release(value: HostTcpReadUpToResult, roc_host: &RocHost) {
+unsafe impl RocRelease<HostTcpReadExactlyResult> for HostTcpReadExactlyResultRelease {
+    unsafe fn release(value: HostTcpReadExactlyResult, roc_host: &RocHost) {
         unsafe { value.decref(roc_host); }
     }
 }
@@ -15769,6 +15769,35 @@ unsafe extern "C" {
     /// The result is owned by Roc: return exactly one owned reference.
     pub fn hosted_cmd_host_exec_output(arg0: AnonStructE09af2c5b0324fa8, arg1: InheritOrSet) -> HostCmdExecOutputResult;
 
+    /// Hosted symbol for Host.crypt_decrypt_aes256_gcm!
+    /// Roc signature: List(U8), List(U8), List(U8), List(U8) => Try(List(U8), [CryptoErr(Str)])
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { arg0.decref(roc_host); }
+    ///     unsafe { arg1.decref(roc_host); }
+    ///     unsafe { arg2.decref(roc_host); }
+    ///     unsafe { arg3.decref(roc_host); }
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_crypt_decrypt_aes256_gcm(arg0: RocListWith<u8, false>, arg1: RocListWith<u8, false>, arg2: RocListWith<u8, false>, arg3: RocListWith<u8, false>) -> HostCryptDecryptAes256GcmResult;
+
+    /// Hosted symbol for Host.crypt_encrypt_aes256_gcm!
+    /// Roc signature: List(U8), List(U8), List(U8) => Try({ auth_tag : List(U8), ciphertext : List(U8) }, [CryptoErr(Str)])
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { arg0.decref(roc_host); }
+    ///     unsafe { arg1.decref(roc_host); }
+    ///     unsafe { arg2.decref(roc_host); }
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_crypt_encrypt_aes256_gcm(arg0: RocListWith<u8, false>, arg1: RocListWith<u8, false>, arg2: RocListWith<u8, false>) -> HostCryptEncryptAes256GcmResult;
+
+    /// Hosted symbol for Host.crypt_sha1!
+    /// Roc signature: List(U8) => Str
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { arg0.decref(roc_host); }
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_crypt_sha1(arg0: RocListWith<u8, false>) -> RocStr;
+
     /// Hosted symbol for Host.dir_create!
     /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) } => Try({}, [DirErr(IOErr)])
     /// Owned arguments. Release each exactly once before returning, unless it is
@@ -15809,12 +15838,13 @@ unsafe extern "C" {
     /// The result is owned by Roc: return exactly one owned reference.
     pub fn hosted_dir_list(arg0: HostDirListArgs) -> HostDirListResult;
 
-    /// Hosted symbol for Host.env_is_windows!
-    /// Roc signature: Str => Bool
+    /// Hosted symbol for Host.env_current_arch_os!
+    /// Roc signature: Str => { arch : Str, os : Str }
     /// Owned arguments. Release each exactly once before returning, unless it is
     /// moved into storage or into the result:
     ///     unsafe { arg0.decref(roc_host); }
-    pub fn hosted_env_is_windows(arg0: RocStr) -> bool;
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_env_current_arch_os(arg0: RocStr) -> AnonStructB635699b1cbc809a;
 
     /// Hosted symbol for Host.env_cwd_unix!
     /// Roc signature: Str => Try(List(U8), [EnvErr(IOErr)])
@@ -15832,6 +15862,11 @@ unsafe extern "C" {
     /// The result is owned by Roc: return exactly one owned reference.
     pub fn hosted_env_cwd_windows(arg0: RocStr) -> HostEnvCwdWindowsResult;
 
+    /// Hosted symbol for Host.env_dict!
+    /// Roc signature: {} => List({ name : [UnixBytes(List(U8)), Utf8(Str), WindowsU16s(List(U16))], value : [UnixBytes(List(U8)), Utf8(Str), WindowsU16s(List(U16))] })
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_env_dict() -> RocList<AnonStruct4028312a23fce46c>;
+
     /// Hosted symbol for Host.env_exe_path_unix!
     /// Roc signature: Str => Try(List(U8), [EnvErr(IOErr)])
     /// Owned arguments. Release each exactly once before returning, unless it is
@@ -15848,6 +15883,13 @@ unsafe extern "C" {
     /// The result is owned by Roc: return exactly one owned reference.
     pub fn hosted_env_exe_path_windows(arg0: RocStr) -> HostEnvCwdWindowsResult;
 
+    /// Hosted symbol for Host.env_is_windows!
+    /// Roc signature: Str => Bool
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { arg0.decref(roc_host); }
+    pub fn hosted_env_is_windows(arg0: RocStr) -> bool;
+
     /// Hosted symbol for Host.env_temp_dir!
     /// Roc signature: Str => { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }
     /// Owned arguments. Release each exactly once before returning, unless it is
@@ -15863,19 +15905,6 @@ unsafe extern "C" {
     ///     unsafe { arg0.decref(roc_host); }
     /// The result is owned by Roc: return exactly one owned reference.
     pub fn hosted_env_var(arg0: UnixBytesOrUtf8OrWindowsU16s) -> HostEnvVarResult;
-
-    /// Hosted symbol for Host.env_dict!
-    /// Roc signature: {} => List({ name : [UnixBytes(List(U8)), Utf8(Str), WindowsU16s(List(U16))], value : [UnixBytes(List(U8)), Utf8(Str), WindowsU16s(List(U16))] })
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_env_dict() -> RocList<AnonStruct4028312a23fce46c>;
-
-    /// Hosted symbol for Host.env_current_arch_os!
-    /// Roc signature: Str => { arch : Str, os : Str }
-    /// Owned arguments. Release each exactly once before returning, unless it is
-    /// moved into storage or into the result:
-    ///     unsafe { arg0.decref(roc_host); }
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_env_current_arch_os(arg0: RocStr) -> AnonStructB635699b1cbc809a;
 
     /// Hosted symbol for Host.file_delete!
     /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) } => Try({}, [FileErr(IOErr)])
@@ -15918,6 +15947,14 @@ unsafe extern "C" {
     /// The result is owned by Roc: return exactly one owned reference.
     pub fn hosted_file_is_writable(arg0: HostFileIsWritableArgs) -> HostFileIsExecutableResult;
 
+    /// Hosted symbol for Host.file_open_reader!
+    /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }, U64 => Try(Host.FileReader, [FileErr(IOErr)])
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { arg0.decref(roc_host); }
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_file_open_reader(arg0: AnonStruct2e21b53659f79626, arg1: u64) -> HostFileOpenReaderResult;
+
     /// Hosted symbol for Host.file_read_bytes!
     /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) } => Try(List(U8), [FileErr(IOErr)])
     /// Owned arguments. Release each exactly once before returning, unless it is
@@ -15926,6 +15963,30 @@ unsafe extern "C" {
     /// The result is owned by Roc: return exactly one owned reference.
     pub fn hosted_file_read_bytes(arg0: HostFileReadBytesArgs) -> HostFileReadBytesResult;
 
+    /// Hosted symbol for Host.file_read_exactly!
+    /// Roc signature: Host.FileReader, U64 => Try(List(U8), [FileErr(IOErr), FileUnexpectedEOF])
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_file_read_exactly(arg0: *mut u64, arg1: u64) -> HostFileReadExactlyResult;
+
+    /// Hosted symbol for Host.file_read_line!
+    /// Roc signature: Host.FileReader => Try(List(U8), [FileErr(IOErr)])
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_file_read_line(arg0: *mut u64) -> HostFileReadBytesResult;
+
+    /// Hosted symbol for Host.file_read_up_to!
+    /// Roc signature: Host.FileReader, U64 => Try(List(U8), [FileErr(IOErr)])
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_file_read_up_to(arg0: *mut u64, arg1: u64) -> HostFileReadBytesResult;
+
     /// Hosted symbol for Host.file_read_utf8!
     /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) } => Try(Str, [FileErr(IOErr)])
     /// Owned arguments. Release each exactly once before returning, unless it is
@@ -15933,6 +15994,23 @@ unsafe extern "C" {
     ///     unsafe { arg0.decref(roc_host); }
     /// The result is owned by Roc: return exactly one owned reference.
     pub fn hosted_file_read_utf8(arg0: HostFileReadUtf8Args) -> HostFileReadUtf8Result;
+
+    /// Hosted symbol for Host.file_reader_position!
+    /// Roc signature: Host.FileReader => Try(U64, [FileErr(IOErr)])
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_file_reader_position(arg0: *mut u64) -> HostFileReaderPositionResult;
+
+    /// Hosted symbol for Host.file_reader_seek!
+    /// Roc signature: Host.FileReader, [Current(I64), End(I64), Start(U64)] => Try(U64, [FileErr(IOErr)])
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
+    ///     unsafe { arg1.decref(roc_host); }
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_file_reader_seek(arg0: *mut u64, arg1: CurrentOrEndOrStart) -> HostFileReaderPositionResult;
 
     /// Hosted symbol for Host.file_rename!
     /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }, { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) } => Try({}, [FileErr(IOErr)])
@@ -15943,13 +16021,21 @@ unsafe extern "C" {
     /// The result is owned by Roc: return exactly one owned reference.
     pub fn hosted_file_rename(arg0: AnonStruct2e21b53659f79626, arg1: AnonStruct2e21b53659f79626) -> HostFileDeleteResult;
 
+    /// Hosted symbol for Host.file_set_len!
+    /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }, U64 => Try({}, [FileErr(IOErr)])
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { arg0.decref(roc_host); }
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_file_set_len(arg0: AnonStruct2e21b53659f79626, arg1: u64) -> HostFileDeleteResult;
+
     /// Hosted symbol for Host.file_size_in_bytes!
     /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) } => Try(U64, [FileErr(IOErr)])
     /// Owned arguments. Release each exactly once before returning, unless it is
     /// moved into storage or into the result:
     ///     unsafe { arg0.decref(roc_host); }
     /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_file_size_in_bytes(arg0: HostFileSizeInBytesArgs) -> HostFileSizeInBytesResult;
+    pub fn hosted_file_size_in_bytes(arg0: HostFileSizeInBytesArgs) -> HostFileReaderPositionResult;
 
     /// Hosted symbol for Host.file_time_accessed!
     /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) } => Try(I128, [FileErr(IOErr)])
@@ -15975,23 +16061,6 @@ unsafe extern "C" {
     /// The result is owned by Roc: return exactly one owned reference.
     pub fn hosted_file_time_modified(arg0: HostFileTimeModifiedArgs) -> HostFileTimeAccessedResult;
 
-    /// Hosted symbol for Host.file_write_bytes_at!
-    /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }, U64, List(U8) => Try({}, [FileErr(IOErr)])
-    /// Owned arguments. Release each exactly once before returning, unless it is
-    /// moved into storage or into the result:
-    ///     unsafe { arg0.decref(roc_host); }
-    ///     unsafe { arg2.decref(roc_host); }
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_file_write_bytes_at(arg0: AnonStruct2e21b53659f79626, arg1: u64, arg2: RocListWith<u8, false>) -> HostFileDeleteResult;
-
-    /// Hosted symbol for Host.file_set_len!
-    /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }, U64 => Try({}, [FileErr(IOErr)])
-    /// Owned arguments. Release each exactly once before returning, unless it is
-    /// moved into storage or into the result:
-    ///     unsafe { arg0.decref(roc_host); }
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_file_set_len(arg0: AnonStruct2e21b53659f79626, arg1: u64) -> HostFileDeleteResult;
-
     /// Hosted symbol for Host.file_write_bytes!
     /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }, List(U8) => Try({}, [FileErr(IOErr)])
     /// Owned arguments. Release each exactly once before returning, unless it is
@@ -16000,6 +16069,15 @@ unsafe extern "C" {
     ///     unsafe { arg1.decref(roc_host); }
     /// The result is owned by Roc: return exactly one owned reference.
     pub fn hosted_file_write_bytes(arg0: AnonStruct2e21b53659f79626, arg1: RocListWith<u8, false>) -> HostFileDeleteResult;
+
+    /// Hosted symbol for Host.file_write_bytes_at!
+    /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }, U64, List(U8) => Try({}, [FileErr(IOErr)])
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { arg0.decref(roc_host); }
+    ///     unsafe { arg2.decref(roc_host); }
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_file_write_bytes_at(arg0: AnonStruct2e21b53659f79626, arg1: u64, arg2: RocListWith<u8, false>) -> HostFileDeleteResult;
 
     /// Hosted symbol for Host.file_write_utf8!
     /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }, Str => Try({}, [FileErr(IOErr)])
@@ -16010,6 +16088,14 @@ unsafe extern "C" {
     /// The result is owned by Roc: return exactly one owned reference.
     pub fn hosted_file_write_utf8(arg0: AnonStruct2e21b53659f79626, arg1: RocStr) -> HostFileDeleteResult;
 
+    /// Hosted symbol for Host.http_send_request!
+    /// Roc signature: { body : List(U8), headers : List({ name : Str, value : Str }), max_response_bytes : U64, method : U8, method_ext : Str, timeout_ms : U64, uri : Str } => Try({ body : List(U8), headers : List({ name : Str, value : Str }), status : U16 }, [InvalidRequest(Str), Transport([Cancelled, ConnectFailed({ detail : Str, host : Str, port : U16, reason : [AddressNotAvailable, ConnectionAborted, ConnectionRefused, ConnectionReset, HostUnreachable, NetworkUnreachable, Other, PermissionDenied, TimedOut] }), ConnectionClosed, DnsFailed({ detail : Str, host : Str }), ExchangeFailed(Str), InvalidResponse(Str), Other(Str), ResponseBodyFailed(Str), ResponseTooLarge({ limit_bytes : U64, received_at_least : U64 }), Saturated, Timeout, TlsFailed({ detail : Str, host : Str })])])
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { arg0.decref(roc_host); }
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_http_send_request(arg0: HostHttpSendRequestArgs) -> HostHttpSendRequestResult;
+
     /// Hosted symbol for Host.path_type!
     /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) } => Try({ is_dir : Bool, is_file : Bool, is_sym_link : Bool }, IOErr)
     /// Owned arguments. Release each exactly once before returning, unless it is
@@ -16018,57 +16104,81 @@ unsafe extern "C" {
     /// The result is owned by Roc: return exactly one owned reference.
     pub fn hosted_path_type(arg0: HostPathTypeArgs) -> HostPathTypeResult;
 
-    /// Hosted symbol for Host.stdout_line!
-    /// Roc signature: Str => Try({}, [StdoutErr(IOErr)])
+    /// Hosted symbol for Host.random_seed_u32!
+    /// Roc signature: {} => Try(U32, [RandomErr(IOErr)])
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_random_seed_u32() -> HostRandomSeedU32Result;
+
+    /// Hosted symbol for Host.random_seed_u64!
+    /// Roc signature: {} => Try(U64, [RandomErr(IOErr)])
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_random_seed_u64() -> HostRandomSeedU64Result;
+
+    /// Hosted symbol for Host.readiness_create!
+    /// Roc signature: Bool => Try(Host.Readiness, [ReadinessCapacityExhausted])
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_readiness_create(arg0: bool) -> HostReadinessCreateResult;
+
+    /// Hosted symbol for Host.readiness_set!
+    /// Roc signature: Host.Readiness, Bool => Try({}, [InvalidReadiness, ServerStopping, StaleReadiness])
     /// Owned arguments. Release each exactly once before returning, unless it is
     /// moved into storage or into the result:
-    ///     unsafe { arg0.decref(roc_host); }
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_stdout_line(arg0: RocStr) -> HostStdoutLineResult;
+    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
+    pub fn hosted_readiness_set(arg0: *mut u64, arg1: bool) -> HostReadinessSetResult;
 
-    /// Hosted symbol for Host.stdout_write!
-    /// Roc signature: Str => Try({}, [StdoutErr(IOErr)])
+    /// Hosted symbol for Host.request_body_read!
+    /// Roc signature: Host.RequestBody, U64 => Try([Chunk(List(U8)), End], [Cancelled, ClientDisconnected, ConcurrentRead, InvalidBody(Str), RequestFinished, Stopping, Timeout, TooLarge({ limit_bytes : U64, received_at_least : U64 })])
     /// Owned arguments. Release each exactly once before returning, unless it is
     /// moved into storage or into the result:
-    ///     unsafe { arg0.decref(roc_host); }
+    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
     /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_stdout_write(arg0: RocStr) -> HostStdoutLineResult;
+    pub fn hosted_request_body_read(arg0: *mut u64, arg1: u64) -> HostRequestBodyReadResult;
 
-    /// Hosted symbol for Host.stdout_write_bytes!
-    /// Roc signature: List(U8) => Try({}, [StdoutErr(IOErr)])
+    /// Hosted symbol for Host.request_body_read_all!
+    /// Roc signature: Host.RequestBody, U64 => Try(List(U8), [Cancelled, ClientDisconnected, ConcurrentRead, InvalidBody(Str), RequestFinished, Stopping, Timeout, TooLarge({ limit_bytes : U64, received_at_least : U64 })])
     /// Owned arguments. Release each exactly once before returning, unless it is
     /// moved into storage or into the result:
-    ///     unsafe { arg0.decref(roc_host); }
+    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
     /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_stdout_write_bytes(arg0: RocListWith<u8, false>) -> HostStdoutLineResult;
+    pub fn hosted_request_body_read_all(arg0: *mut u64, arg1: u64) -> HostRequestBodyReadAllResult;
 
-    /// Hosted symbol for Host.stderr_line!
-    /// Roc signature: Str => Try({}, [StderrErr(IOErr)])
+    /// Hosted symbol for Host.request_body_write_file!
+    /// Roc signature: Host.RequestBody, U64, Str, Str, U8 => Try({ bytes_written : U64, digest : [NotComputed, Sha256Digest(List(U8))] }, [Cancelled, CleanupFailed(Str), ClientDisconnected, ConcurrentRead, DestinationExists, Filesystem(Str), InvalidBody(Str), InvalidRelativeFile, InvalidRoot, PermissionDenied, PublishFailed(Str), RequestFinished, Saturated, Stopping, StorageFull, Timeout, TooLarge({ limit_bytes : U64, received_at_least : U64 })])
     /// Owned arguments. Release each exactly once before returning, unless it is
     /// moved into storage or into the result:
-    ///     unsafe { arg0.decref(roc_host); }
+    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
+    ///     unsafe { arg2.decref(roc_host); }
+    ///     unsafe { arg3.decref(roc_host); }
     /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_stderr_line(arg0: RocStr) -> HostStderrLineResult;
+    pub fn hosted_request_body_write_file(arg0: *mut u64, arg1: u64, arg2: RocStr, arg3: RocStr, arg4: u8) -> HostRequestBodyWriteFileResult;
 
-    /// Hosted symbol for Host.stderr_write!
-    /// Roc signature: Str => Try({}, [StderrErr(IOErr)])
+    /// Hosted symbol for Host.sleep_millis!
+    /// Roc signature: U64 => {}
+    pub fn hosted_sleep_millis(arg0: u64);
+
+    /// Hosted symbol for Host.sqlite_begin!
+    /// Roc signature: Host.SqliteDb, I64 => Try(Host.SqliteTxn, { code : I64, message : Str })
     /// Owned arguments. Release each exactly once before returning, unless it is
     /// moved into storage or into the result:
-    ///     unsafe { arg0.decref(roc_host); }
+    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
     /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_stderr_write(arg0: RocStr) -> HostStderrLineResult;
+    pub fn hosted_sqlite_begin(arg0: *mut u64, arg1: i64) -> HostSqliteBeginResult;
 
-    /// Hosted symbol for Host.stderr_write_bytes!
-    /// Roc signature: List(U8) => Try({}, [StderrErr(IOErr)])
+    /// Hosted symbol for Host.sqlite_columns!
+    /// Roc signature: Host.SqliteStmt => Try(List(Str), { code : I64, message : Str })
     /// Owned arguments. Release each exactly once before returning, unless it is
     /// moved into storage or into the result:
-    ///     unsafe { arg0.decref(roc_host); }
+    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
     /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_stderr_write_bytes(arg0: RocListWith<u8, false>) -> HostStderrLineResult;
+    pub fn hosted_sqlite_columns(arg0: *mut u64) -> HostSqliteColumnsResult;
 
-    /// Hosted symbol for Host.unix_time_now!
-    /// Roc signature: {} => I128
-    pub fn hosted_unix_time_now() -> i128;
+    /// Hosted symbol for Host.sqlite_next_row!
+    /// Roc signature: Host.SqliteExec, U64, Bool => Try([Done, ResultTooLarge, Row({ bytes : U64, values : List([Bytes(List(U8)), Integer(I64), Null, Real(F64), String(Str)]) }), RowLimitExceeded], { code : I64, message : Str })
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_sqlite_next_row(arg0: *mut u64, arg1: u64, arg2: bool) -> HostSqliteNextRowResult;
 
     /// Hosted symbol for Host.sqlite_open!
     /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }, U64, U64, U64, U64, I64, I64 => Try(Host.SqliteDb, { code : I64, message : Str })
@@ -16096,29 +16206,13 @@ unsafe extern "C" {
     /// The result is owned by Roc: return exactly one owned reference.
     pub fn hosted_sqlite_start(arg0: *mut u64, arg1: RocList<AnonStruct2782504baf739389>, arg2: u64) -> HostSqliteStartResult;
 
-    /// Hosted symbol for Host.sqlite_columns!
-    /// Roc signature: Host.SqliteStmt => Try(List(Str), { code : I64, message : Str })
+    /// Hosted symbol for Host.sqlite_txn_finish!
+    /// Roc signature: Host.SqliteTxn, Bool => Try({}, { code : I64, message : Str })
     /// Owned arguments. Release each exactly once before returning, unless it is
     /// moved into storage or into the result:
     ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
     /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_sqlite_columns(arg0: *mut u64) -> HostSqliteColumnsResult;
-
-    /// Hosted symbol for Host.sqlite_next_row!
-    /// Roc signature: Host.SqliteExec, U64, Bool => Try([Done, ResultTooLarge, Row({ bytes : U64, values : List([Bytes(List(U8)), Integer(I64), Null, Real(F64), String(Str)]) }), RowLimitExceeded], { code : I64, message : Str })
-    /// Owned arguments. Release each exactly once before returning, unless it is
-    /// moved into storage or into the result:
-    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_sqlite_next_row(arg0: *mut u64, arg1: u64, arg2: bool) -> HostSqliteNextRowResult;
-
-    /// Hosted symbol for Host.sqlite_begin!
-    /// Roc signature: Host.SqliteDb, I64 => Try(Host.SqliteTxn, { code : I64, message : Str })
-    /// Owned arguments. Release each exactly once before returning, unless it is
-    /// moved into storage or into the result:
-    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_sqlite_begin(arg0: *mut u64, arg1: i64) -> HostSqliteBeginResult;
+    pub fn hosted_sqlite_txn_finish(arg0: *mut u64, arg1: bool) -> HostSqliteTxnFinishResult;
 
     /// Hosted symbol for Host.sqlite_txn_prepare!
     /// Roc signature: Host.SqliteTxn, Str => Try(Host.SqliteStmt, { code : I64, message : Str })
@@ -16129,13 +16223,53 @@ unsafe extern "C" {
     /// The result is owned by Roc: return exactly one owned reference.
     pub fn hosted_sqlite_txn_prepare(arg0: *mut u64, arg1: RocStr) -> HostSqlitePrepareResult;
 
-    /// Hosted symbol for Host.sqlite_txn_finish!
-    /// Roc signature: Host.SqliteTxn, Bool => Try({}, { code : I64, message : Str })
+    /// Hosted symbol for Host.stderr_line!
+    /// Roc signature: Str => Try({}, [StderrErr(IOErr)])
     /// Owned arguments. Release each exactly once before returning, unless it is
     /// moved into storage or into the result:
-    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
+    ///     unsafe { arg0.decref(roc_host); }
     /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_sqlite_txn_finish(arg0: *mut u64, arg1: bool) -> HostSqliteTxnFinishResult;
+    pub fn hosted_stderr_line(arg0: RocStr) -> HostStderrLineResult;
+
+    /// Hosted symbol for Host.stderr_write!
+    /// Roc signature: Str => Try({}, [StderrErr(IOErr)])
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { arg0.decref(roc_host); }
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_stderr_write(arg0: RocStr) -> HostStderrLineResult;
+
+    /// Hosted symbol for Host.stderr_write_bytes!
+    /// Roc signature: List(U8) => Try({}, [StderrErr(IOErr)])
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { arg0.decref(roc_host); }
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_stderr_write_bytes(arg0: RocListWith<u8, false>) -> HostStderrLineResult;
+
+    /// Hosted symbol for Host.stdout_line!
+    /// Roc signature: Str => Try({}, [StdoutErr(IOErr)])
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { arg0.decref(roc_host); }
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_stdout_line(arg0: RocStr) -> HostStdoutLineResult;
+
+    /// Hosted symbol for Host.stdout_write!
+    /// Roc signature: Str => Try({}, [StdoutErr(IOErr)])
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { arg0.decref(roc_host); }
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_stdout_write(arg0: RocStr) -> HostStdoutLineResult;
+
+    /// Hosted symbol for Host.stdout_write_bytes!
+    /// Roc signature: List(U8) => Try({}, [StdoutErr(IOErr)])
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { arg0.decref(roc_host); }
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_stdout_write_bytes(arg0: RocListWith<u8, false>) -> HostStdoutLineResult;
 
     /// Hosted symbol for Host.tcp_connect!
     /// Roc signature: Str, U16 => Try(Host.TcpStream, Str)
@@ -16145,21 +16279,13 @@ unsafe extern "C" {
     /// The result is owned by Roc: return exactly one owned reference.
     pub fn hosted_tcp_connect(arg0: RocStr, arg1: u16) -> HostTcpConnectResult;
 
-    /// Hosted symbol for Host.tcp_read_up_to!
-    /// Roc signature: Host.TcpStream, U64 => Try(List(U8), Str)
-    /// Owned arguments. Release each exactly once before returning, unless it is
-    /// moved into storage or into the result:
-    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_tcp_read_up_to(arg0: *mut u64, arg1: u64) -> HostTcpReadUpToResult;
-
     /// Hosted symbol for Host.tcp_read_exactly!
     /// Roc signature: Host.TcpStream, U64 => Try(List(U8), Str)
     /// Owned arguments. Release each exactly once before returning, unless it is
     /// moved into storage or into the result:
     ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
     /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_tcp_read_exactly(arg0: *mut u64, arg1: u64) -> HostTcpReadUpToResult;
+    pub fn hosted_tcp_read_exactly(arg0: *mut u64, arg1: u64) -> HostTcpReadExactlyResult;
 
     /// Hosted symbol for Host.tcp_read_until!
     /// Roc signature: Host.TcpStream, U8 => Try(List(U8), Str)
@@ -16167,7 +16293,15 @@ unsafe extern "C" {
     /// moved into storage or into the result:
     ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
     /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_tcp_read_until(arg0: *mut u64, arg1: u8) -> HostTcpReadUpToResult;
+    pub fn hosted_tcp_read_until(arg0: *mut u64, arg1: u8) -> HostTcpReadExactlyResult;
+
+    /// Hosted symbol for Host.tcp_read_up_to!
+    /// Roc signature: Host.TcpStream, U64 => Try(List(U8), Str)
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
+    /// The result is owned by Roc: return exactly one owned reference.
+    pub fn hosted_tcp_read_up_to(arg0: *mut u64, arg1: u64) -> HostTcpReadExactlyResult;
 
     /// Hosted symbol for Host.tcp_write!
     /// Roc signature: Host.TcpStream, List(U8) => Try({}, Str)
@@ -16178,143 +16312,9 @@ unsafe extern "C" {
     /// The result is owned by Roc: return exactly one owned reference.
     pub fn hosted_tcp_write(arg0: *mut u64, arg1: RocListWith<u8, false>) -> HostTcpWriteResult;
 
-    /// Hosted symbol for Host.http_send_request!
-    /// Roc signature: { body : List(U8), headers : List({ name : Str, value : Str }), max_response_bytes : U64, method : U8, method_ext : Str, timeout_ms : U64, uri : Str } => Try({ body : List(U8), headers : List({ name : Str, value : Str }), status : U16 }, [InvalidRequest(Str), Transport([Cancelled, ConnectFailed({ detail : Str, host : Str, port : U16, reason : [AddressNotAvailable, ConnectionAborted, ConnectionRefused, ConnectionReset, HostUnreachable, NetworkUnreachable, Other, PermissionDenied, TimedOut] }), ConnectionClosed, DnsFailed({ detail : Str, host : Str }), ExchangeFailed(Str), InvalidResponse(Str), Other(Str), ResponseBodyFailed(Str), ResponseTooLarge({ limit_bytes : U64, received_at_least : U64 }), Saturated, Timeout, TlsFailed({ detail : Str, host : Str })])])
-    /// Owned arguments. Release each exactly once before returning, unless it is
-    /// moved into storage or into the result:
-    ///     unsafe { arg0.decref(roc_host); }
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_http_send_request(arg0: HostHttpSendRequestArgs) -> HostHttpSendRequestResult;
-
-    /// Hosted symbol for Host.file_open_reader!
-    /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) }, U64 => Try(Host.FileReader, [FileErr(IOErr)])
-    /// Owned arguments. Release each exactly once before returning, unless it is
-    /// moved into storage or into the result:
-    ///     unsafe { arg0.decref(roc_host); }
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_file_open_reader(arg0: AnonStruct2e21b53659f79626, arg1: u64) -> HostFileOpenReaderResult;
-
-    /// Hosted symbol for Host.file_read_line!
-    /// Roc signature: Host.FileReader => Try(List(U8), [FileErr(IOErr)])
-    /// Owned arguments. Release each exactly once before returning, unless it is
-    /// moved into storage or into the result:
-    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_file_read_line(arg0: *mut u64) -> HostFileReadBytesResult;
-
-    /// Hosted symbol for Host.file_read_up_to!
-    /// Roc signature: Host.FileReader, U64 => Try(List(U8), [FileErr(IOErr)])
-    /// Owned arguments. Release each exactly once before returning, unless it is
-    /// moved into storage or into the result:
-    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_file_read_up_to(arg0: *mut u64, arg1: u64) -> HostFileReadBytesResult;
-
-    /// Hosted symbol for Host.file_read_exactly!
-    /// Roc signature: Host.FileReader, U64 => Try(List(U8), [FileErr(IOErr), FileUnexpectedEOF])
-    /// Owned arguments. Release each exactly once before returning, unless it is
-    /// moved into storage or into the result:
-    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_file_read_exactly(arg0: *mut u64, arg1: u64) -> HostFileReadExactlyResult;
-
-    /// Hosted symbol for Host.file_reader_position!
-    /// Roc signature: Host.FileReader => Try(U64, [FileErr(IOErr)])
-    /// Owned arguments. Release each exactly once before returning, unless it is
-    /// moved into storage or into the result:
-    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_file_reader_position(arg0: *mut u64) -> HostFileSizeInBytesResult;
-
-    /// Hosted symbol for Host.file_reader_seek!
-    /// Roc signature: Host.FileReader, [Current(I64), End(I64), Start(U64)] => Try(U64, [FileErr(IOErr)])
-    /// Owned arguments. Release each exactly once before returning, unless it is
-    /// moved into storage or into the result:
-    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
-    ///     unsafe { arg1.decref(roc_host); }
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_file_reader_seek(arg0: *mut u64, arg1: CurrentOrEndOrStart) -> HostFileSizeInBytesResult;
-
-    /// Hosted symbol for Host.sleep_millis!
-    /// Roc signature: U64 => {}
-    pub fn hosted_sleep_millis(arg0: u64);
-
-    /// Hosted symbol for Host.request_body_read!
-    /// Roc signature: Host.RequestBody, U64 => Try([Chunk(List(U8)), End], [Cancelled, ClientDisconnected, ConcurrentRead, InvalidBody(Str), RequestFinished, Stopping, Timeout, TooLarge({ limit_bytes : U64, received_at_least : U64 })])
-    /// Owned arguments. Release each exactly once before returning, unless it is
-    /// moved into storage or into the result:
-    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_request_body_read(arg0: *mut u64, arg1: u64) -> HostRequestBodyReadResult;
-
-    /// Hosted symbol for Host.request_body_read_all!
-    /// Roc signature: Host.RequestBody, U64 => Try(List(U8), [Cancelled, ClientDisconnected, ConcurrentRead, InvalidBody(Str), RequestFinished, Stopping, Timeout, TooLarge({ limit_bytes : U64, received_at_least : U64 })])
-    /// Owned arguments. Release each exactly once before returning, unless it is
-    /// moved into storage or into the result:
-    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_request_body_read_all(arg0: *mut u64, arg1: u64) -> HostRequestBodyReadAllResult;
-
-    /// Hosted symbol for Host.crypt_sha1!
-    /// Roc signature: List(U8) => Str
-    /// Owned arguments. Release each exactly once before returning, unless it is
-    /// moved into storage or into the result:
-    ///     unsafe { arg0.decref(roc_host); }
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_crypt_sha1(arg0: RocListWith<u8, false>) -> RocStr;
-
-    /// Hosted symbol for Host.crypt_encrypt_aes256_gcm!
-    /// Roc signature: List(U8), List(U8), List(U8) => Try({ auth_tag : List(U8), ciphertext : List(U8) }, [CryptoErr(Str)])
-    /// Owned arguments. Release each exactly once before returning, unless it is
-    /// moved into storage or into the result:
-    ///     unsafe { arg0.decref(roc_host); }
-    ///     unsafe { arg1.decref(roc_host); }
-    ///     unsafe { arg2.decref(roc_host); }
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_crypt_encrypt_aes256_gcm(arg0: RocListWith<u8, false>, arg1: RocListWith<u8, false>, arg2: RocListWith<u8, false>) -> HostCryptEncryptAes256GcmResult;
-
-    /// Hosted symbol for Host.crypt_decrypt_aes256_gcm!
-    /// Roc signature: List(U8), List(U8), List(U8), List(U8) => Try(List(U8), [CryptoErr(Str)])
-    /// Owned arguments. Release each exactly once before returning, unless it is
-    /// moved into storage or into the result:
-    ///     unsafe { arg0.decref(roc_host); }
-    ///     unsafe { arg1.decref(roc_host); }
-    ///     unsafe { arg2.decref(roc_host); }
-    ///     unsafe { arg3.decref(roc_host); }
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_crypt_decrypt_aes256_gcm(arg0: RocListWith<u8, false>, arg1: RocListWith<u8, false>, arg2: RocListWith<u8, false>, arg3: RocListWith<u8, false>) -> HostCryptDecryptAes256GcmResult;
-
-    /// Hosted symbol for Host.random_seed_u32!
-    /// Roc signature: {} => Try(U32, [RandomErr(IOErr)])
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_random_seed_u32() -> HostRandomSeedU32Result;
-
-    /// Hosted symbol for Host.random_seed_u64!
-    /// Roc signature: {} => Try(U64, [RandomErr(IOErr)])
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_random_seed_u64() -> HostRandomSeedU64Result;
-
-    /// Hosted symbol for Host.readiness_create!
-    /// Roc signature: Bool => Try(Host.Readiness, [ReadinessCapacityExhausted])
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_readiness_create(arg0: bool) -> HostReadinessCreateResult;
-
-    /// Hosted symbol for Host.readiness_set!
-    /// Roc signature: Host.Readiness, Bool => Try({}, [InvalidReadiness, ServerStopping, StaleReadiness])
-    /// Owned arguments. Release each exactly once before returning, unless it is
-    /// moved into storage or into the result:
-    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
-    pub fn hosted_readiness_set(arg0: *mut u64, arg1: bool) -> HostReadinessSetResult;
-
-    /// Hosted symbol for Host.request_body_write_file!
-    /// Roc signature: Host.RequestBody, U64, Str, Str, U8 => Try({ bytes_written : U64, digest : [NotComputed, Sha256Digest(List(U8))] }, [Cancelled, CleanupFailed(Str), ClientDisconnected, ConcurrentRead, DestinationExists, Filesystem(Str), InvalidBody(Str), InvalidRelativeFile, InvalidRoot, PermissionDenied, PublishFailed(Str), RequestFinished, Saturated, Stopping, StorageFull, Timeout, TooLarge({ limit_bytes : U64, received_at_least : U64 })])
-    /// Owned arguments. Release each exactly once before returning, unless it is
-    /// moved into storage or into the result:
-    ///     unsafe { decref_box_with(arg0 as RocBox, core::mem::align_of::<u64>(), false, None, roc_host); }
-    ///     unsafe { arg2.decref(roc_host); }
-    ///     unsafe { arg3.decref(roc_host); }
-    /// The result is owned by Roc: return exactly one owned reference.
-    pub fn hosted_request_body_write_file(arg0: *mut u64, arg1: u64, arg2: RocStr, arg3: RocStr, arg4: u8) -> HostRequestBodyWriteFileResult;
+    /// Hosted symbol for Host.unix_time_now!
+    /// Roc signature: {} => I128
+    pub fn hosted_unix_time_now() -> i128;
 
 }
 
@@ -16456,6 +16456,9 @@ unsafe extern "C" {
     /// Entrypoint: respond_for_host!
     pub fn roc_respond_for_host(arg0: AnonStruct66bd3eb5a5fde7bc, arg1: RocBox) -> InternalServerOutcomeToHost;
 
+    /// Entrypoint: shutdown_for_host!
+    pub fn roc_shutdown_for_host(arg0: AnonStruct628b43fd33b27733, arg1: RocBox) -> ShutdownForHostResult;
+
     /// Entrypoint: sse_advance_for_host!
     pub fn roc_sse_advance_for_host(arg0: RocErasedCallable, arg1: u64) -> SseStepToHost;
 
@@ -16464,9 +16467,6 @@ unsafe extern "C" {
 
     /// Entrypoint: sse_drop_step_for_host!
     pub fn roc_sse_drop_step_for_host(arg0: SseStepToHost);
-
-    /// Entrypoint: shutdown_for_host!
-    pub fn roc_shutdown_for_host(arg0: AnonStruct628b43fd33b27733, arg1: RocBox) -> ShutdownForHostResult;
 
 }
 
