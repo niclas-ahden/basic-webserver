@@ -1,4 +1,5 @@
 use core::ffi::c_void;
+use core::ptr::NonNull;
 use std::io;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::OnceLock;
@@ -231,7 +232,7 @@ pub(crate) fn roc_host() -> &'static RocHost {
 }
 
 #[no_mangle]
-pub extern "C" fn roc_alloc(length: usize, alignment: usize) -> *mut c_void {
+pub extern "C" fn roc_alloc(length: usize, alignment: usize) -> NonNull<c_void> {
     crate::roc_alloc::roc_alloc(roc_host_ptr(), length, alignment)
 }
 
@@ -285,7 +286,7 @@ pub(crate) extern "C" fn routed_roc_realloc(
     ptr: *mut c_void,
     new_length: usize,
     alignment: usize,
-) -> *mut c_void {
+) -> NonNull<c_void> {
     if is_host_resource_address(ptr) {
         eprintln!("fatal: Roc attempted to reallocate an opaque host resource");
         std::process::abort();
@@ -298,7 +299,7 @@ pub extern "C" fn roc_realloc(
     ptr: *mut c_void,
     new_length: usize,
     alignment: usize,
-) -> *mut c_void {
+) -> NonNull<c_void> {
     routed_roc_realloc(roc_host_ptr(), ptr, new_length, alignment)
 }
 

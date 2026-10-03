@@ -12,7 +12,7 @@
     nixpkgs-x86-darwin.url = "github:NixOS/nixpkgs/nixpkgs-26.05-darwin";
     # The full commit of the Roc nightly that .roc-version pins, keep the
     # `?dir=src` at the end. The devshell refuses to start when they differ.
-    roc-src.url = "github:roc-lang/roc/7f11a825fb2df7fd48edb11e8c593ffdad4fcdb5?dir=src";
+    roc-src.url = "github:roc-lang/roc/bba1acca4f2f4dc196c0c869004baef3b52d41d5?dir=src";
     roc-nix = {
       url = "github:niclas-ahden/roc-nix";
       inputs.nixpkgs.follows = "nixpkgs";
