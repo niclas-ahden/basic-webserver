@@ -180,6 +180,9 @@ systems, time zones, and text formatting are deliberately left to the Roc
 package ecosystem. The time-using examples demonstrate converting
 `UnixTime.Timestamp` values with
 [`roc-gregorian`](https://git.sr.ht/~jwoudenberg/roc/tree/main/item/gregorian).
+Those six examples are temporarily kept as `.todoroc` files until the package
+publishes a release compatible with the pinned compiler; each records a TODO
+to restore the example and its HTTP specification cases.
 
 Outbound HTTP calls default to a 30-second total deadline and an 8 MiB response
 body. At most 64 calls run and 256 wait for admission. The shared client pools
