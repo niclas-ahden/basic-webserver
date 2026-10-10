@@ -10,8 +10,8 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     # nixos-unstable no longer supports Intel macOS.
     nixpkgs-x86-darwin.url = "github:NixOS/nixpkgs/nixpkgs-26.05-darwin";
-    # The full commit of the Roc nightly that .roc-version pins, keep the
-    # `?dir=src` at the end. The devshell refuses to start when they differ.
+    # The Roc compiler revision, keep the `?dir=src` at the end. CI builds
+    # this exact commit too, read from flake.lock.
     roc-src.url = "github:roc-lang/roc/bba1acca4f2f4dc196c0c869004baef3b52d41d5?dir=src";
     roc-nix = {
       url = "github:niclas-ahden/roc-nix";
@@ -43,13 +43,6 @@
       ];
       forAllSystems = lib.genAttrs supportedSystems;
       rustToolchainConfig = (builtins.fromTOML (builtins.readFile ./rust-toolchain.toml)).toolchain;
-
-      # .roc-version names the Roc nightly that CI and the example manifests
-      # use, and the devshell must build the same commit.
-      rocNightly = lib.trim (builtins.readFile ./.roc-version);
-      rocPinMatches = lib.assertMsg (lib.hasSuffix "-${roc-src.shortRev}" rocNightly) ''
-        flake.nix pins roc-lang/roc ${roc-src.shortRev} but .roc-version is ${rocNightly}.
-        Point the roc-src url at that nightly's commit and run `nix flake lock`.'';
 
       # scripts/build.py cross-compiles the host with `zig cc` for the musl
       # targets, so those work from any host. The macOS targets need an Apple
@@ -94,7 +87,7 @@
           );
         in
         {
-          default = assert rocPinMatches; pkgs.mkShell {
+          default = pkgs.mkShell {
             packages = [
               roc
               pkgs.python3

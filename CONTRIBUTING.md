@@ -34,27 +34,13 @@ for a distinct reusable workflow.
 - Native build tools for your operating system. Windows host builds require
   MSVC and the Windows SDK.
 
-The exact Roc nightly used for development, CI, and releases is recorded in
-[`.roc-version`](.roc-version), and every `examples/` manifest repeats it in
-its `roc:` entry. The CI action in
-[`.github/actions/setup-roc`](.github/actions/setup-roc/action.yml) installs
-that version, and `python scripts/test.py --operation validate` fails when a
-manifest drifts from it. Move both to another nightly with:
-
-```sh
-python scripts/update_roc_version.py nightly-2026-08-13-2fdd90e
-```
-
-A scheduled workflow,
-[`update_roc_nightly.yml`](.github/workflows/update_roc_nightly.yml), runs that
-script for the latest nightly, pushes the result to the `update-roc-nightly`
-branch, runs CI with that nightly, and opens a pull request reporting whether
-it passed.
-
-With Nix flakes enabled, `nix develop` provides all of the above, building the
-compiler from the commit of the pinned nightly. When you move `.roc-version`,
-point the `roc-src` url in [`flake.nix`](flake.nix) at the new commit and run
-`nix flake lock`. The shell refuses to start while the two disagree.
+The exact Roc commit used for development, CI, and releases is the `roc-src`
+input locked in [`flake.lock`](flake.lock). With Nix flakes enabled,
+`nix develop` provides all of the above, building that compiler. The CI action
+in [`.github/actions/setup-roc`](.github/actions/setup-roc/action.yml) builds
+the same commit from source and caches it. Move to another commit by pointing
+the `roc-src` url in [`flake.nix`](flake.nix) at it and running
+`nix flake lock`.
 
 ## Build and run locally
 
