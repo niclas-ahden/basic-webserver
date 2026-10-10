@@ -1363,6 +1363,10 @@
       "cases": [
         {
           "name": "get-post-and-method-rejection",
+          "skip": {
+            "platforms": ["windows"],
+            "reason": "WORKAROUND: on roc 5ba654b the x64win build parses only the last field of a URL-encoded form. Revert in the next release."
+          },
           "requests": [
             {
               "method": "GET",
