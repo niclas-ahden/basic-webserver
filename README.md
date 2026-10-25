@@ -3,7 +3,7 @@
 [roc_badge]: https://img.shields.io/endpoint?url=https%3A%2F%2Froc-lang.org%2Fbadge%2Froc.json
 [roc_link]: https://github.com/roc-lang/roc
 
-[Latest release](https://github.com/roc-lang/basic-webserver/releases/latest) ·
+[Latest release](https://github.com/niclas-ahden/basic-webserver/releases/tag/0.20.0) ·
 [Documentation](https://roc-lang.github.io/basic-webserver/) ·
 [Examples](https://github.com/roc-lang/basic-webserver/tree/main/examples)
 
