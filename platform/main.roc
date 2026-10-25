@@ -17,6 +17,7 @@ platform "webserver"
 	exposes [
 		Attribute,
 		Cmd,
+		Crypt,
 		Env,
 		File,
 		Html,
@@ -25,6 +26,7 @@ platform "webserver"
 		MultipartFormData,
 		OsStr,
 		Path,
+		Random,
 		Server,
 		Sleep,
 		Sqlite,
@@ -52,6 +54,9 @@ platform "webserver"
 	hosted {
 		"hosted_cmd_host_exec_exit_code": Host.cmd_exec_exit_code!,
 		"hosted_cmd_host_exec_output": Host.cmd_exec_output!,
+		"hosted_crypt_decrypt_aes256_gcm": Host.crypt_decrypt_aes256_gcm!,
+		"hosted_crypt_encrypt_aes256_gcm": Host.crypt_encrypt_aes256_gcm!,
+		"hosted_crypt_sha1": Host.crypt_sha1!,
 		"hosted_dir_create": Host.dir_create!,
 		"hosted_dir_create_all": Host.dir_create_all!,
 		"hosted_dir_delete_all": Host.dir_delete_all!,
@@ -84,6 +89,8 @@ platform "webserver"
 		"hosted_file_write_utf8": Host.file_write_utf8!,
 		"hosted_http_send_request": Host.http_send_request!,
 		"hosted_path_type": Host.path_type!,
+		"hosted_random_seed_u32": Host.random_seed_u32!,
+		"hosted_random_seed_u64": Host.random_seed_u64!,
 		"hosted_readiness_create": Host.readiness_create!,
 		"hosted_readiness_set": Host.readiness_set!,
 		"hosted_request_body_read": Host.request_body_read!,
@@ -121,6 +128,7 @@ platform "webserver"
 	}
 
 import Cmd
+import Crypt
 import Env
 import File
 import Host
@@ -130,6 +138,7 @@ import Http
 import IOErr
 import OsStr
 import Path
+import Random
 import Server
 import Sse
 import Sleep

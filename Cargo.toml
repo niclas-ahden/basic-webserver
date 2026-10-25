@@ -26,8 +26,11 @@ required-features = ["benchmark-driver"]
 unexpected_cfgs = { level = "warn", check-cfg = ["cfg(no_roc_std_helpers)"] }
 
 [dependencies]
+aes-gcm = "=0.10.3"
+getrandom = "=0.2.17"
 libc = "=0.2.172"
 libsqlite3-sys = { version = "=0.33.0", features = ["bundled"] }
+sha1 = "=0.10.6"
 bytes = "=1.11.1"
 brotli = "=8.0.4"
 cap-primitives = "=4.0.2"
