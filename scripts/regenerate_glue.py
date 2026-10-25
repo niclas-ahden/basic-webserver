@@ -5,8 +5,8 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import json
 import os
-import re
 import shutil
 import subprocess
 import tempfile
@@ -19,18 +19,16 @@ from pathlib import Path
 # generated with that compiler and its matching RustGlue.roc. Compiler and
 # glue-spec revisions must match.
 ROOT = Path(__file__).resolve().parents[1]
-ROC_VERSION_FILE = ROOT / ".roc-version"
-NIGHTLY_TAG = re.compile(
-    r"^nightly-[0-9]{4}-(?:[A-Za-z]+|[0-9]{2})-[0-9]{2}-([0-9a-f]{7})$"
-)
+FLAKE_LOCK = ROOT / "flake.lock"
 
 
-def pinned_roc() -> tuple[str, str]:
-    tag = ROC_VERSION_FILE.read_text(encoding="utf-8").strip()
-    match = NIGHTLY_TAG.fullmatch(tag)
-    if match is None:
-        raise SystemExit(f"Invalid Roc nightly tag in {ROC_VERSION_FILE}: {tag!r}")
-    return tag, match.group(1)
+def pinned_roc() -> str:
+    """The roc-lang/roc commit that flake.lock pins, as a short revision."""
+    lock = json.loads(FLAKE_LOCK.read_text(encoding="utf-8"))
+    revision = lock.get("nodes", {}).get("roc-src", {}).get("locked", {}).get("rev")
+    if not revision:
+        raise SystemExit(f"{FLAKE_LOCK} has no locked roc-src revision")
+    return revision[:7]
 
 
 def rooted_path(value: str) -> Path:
@@ -51,7 +49,7 @@ def roc_executable(value: str) -> str:
 
 
 def require_known_roc(roc: str) -> None:
-    nightly_tag, revision = pinned_roc()
+    revision = pinned_roc()
     result = subprocess.run(
         [roc, "version"],
         check=True,
@@ -62,7 +60,7 @@ def require_known_roc(roc: str) -> None:
     if revision not in version:
         raise SystemExit(
             "Rust glue must be generated with the pinned Roc compiler "
-            f"{nightly_tag}, but `roc version` reported:\n"
+            f"{revision}, but `roc version` reported:\n"
             f"{version.strip()}"
         )
 
@@ -120,11 +118,10 @@ def run_glue(roc: str, glue_spec: Path, platform_file: Path, out_dir: Path) -> N
         check=False,
     )
     if result.returncode != 0:
-        nightly_tag, _revision = pinned_roc()
         raise SystemExit(
             "Glue generation failed.\n"
             "Use matching Roc and RustGlue.roc revisions; "
-            f"{nightly_tag} is the pinned compiler."
+            f"{pinned_roc()} is the pinned compiler."
         )
 
 
