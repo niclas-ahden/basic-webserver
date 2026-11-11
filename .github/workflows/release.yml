@@ -70,7 +70,9 @@ jobs:
     needs: [rust-version, build-windows-host]
     # macOS cross-compiles the Apple and Linux musl hosts. Windows is built
     # natively above because the Rust dependencies require Windows SDK headers.
-    runs-on: macos-15
+    # TEMPORARY: macos-15 (arm64) runners are not acquired for this fork, so
+    # the bundle is built on Intel, which cross-compiles every target anyway.
+    runs-on: macos-15-intel
     outputs:
       release_version: ${{ steps.validate.outputs.release_version }}
       docs_version: ${{ steps.validate.outputs.docs_version }}
@@ -186,8 +188,7 @@ jobs:
             os: ubuntu-24.04-arm
           - id: macos-x64
             os: macos-26-intel
-          - id: macos-arm64
-            os: macos-26
+          # TEMPORARY: no arm64 macOS builder, see the build job.
           - id: windows-x64
             os: windows-2025
 
@@ -263,8 +264,7 @@ jobs:
             target: arm64musl
           - os: macos-26-intel
             target: x64mac
-          - os: macos-26
-            target: arm64mac
+          # TEMPORARY: arm64mac is not run, see the build job.
           - os: windows-2025
             target: x64win
 
@@ -362,7 +362,8 @@ jobs:
     needs:
       - build
       - build-docs
-      - cross-platform-conformance
+      # TEMPORARY: the comparison needs arm64mac results, see the build job.
+      - run-examples
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
