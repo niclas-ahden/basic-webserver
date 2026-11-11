@@ -12,7 +12,7 @@
     nixpkgs-x86-darwin.url = "github:NixOS/nixpkgs/nixpkgs-26.05-darwin";
     # The Roc compiler revision, keep the `?dir=src` at the end. CI builds
     # this exact commit too, read from flake.lock.
-    roc-src.url = "github:roc-lang/roc/72704da992c1bc1d78a5f32d3a4588948e5d6ed1?dir=src";
+    roc-src.url = "github:roc-lang/roc/bf477beeebe1fc788fd66ada9826ccc95c676c6d?dir=src";
     roc-nix = {
       url = "github:niclas-ahden/roc-nix";
       inputs.nixpkgs.follows = "nixpkgs";
