@@ -249,6 +249,10 @@ Sqlite :: [].{
 		rename_field : RowEncoding, Str -> Str
 		rename_field = |_, name| name
 
+		## A field of the row type that no column filled.
+		missing_field : RowEncoding, Str -> QueryError
+		missing_field = |_, name| MissingRequiredField(name)
+
 		parse_record_start : RowEncoding, RowState -> Try([Counted({ len : U64, rest : RowState }), Uncounted(RowState)], QueryError)
 		parse_record_start = |_, state| Ok(Uncounted(state))
 
