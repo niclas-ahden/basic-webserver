@@ -96,7 +96,7 @@ File :: [].{
 				Ok(
 					Stream.custom(
 						Reading(reader),
-						Unknown,
+						Err(Unknown),
 						|state|
 							match state {
 								Finished => Err(NoMore)
