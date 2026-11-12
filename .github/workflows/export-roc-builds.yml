@@ -1,0 +1,119 @@
+name: Export cached Roc builds
+
+# One-off: packages the compilers this repository's CI built and cached for
+# roc-lang/roc 4b7b125 as niclas-ahden/roc-builds archives. Runs on pushes to
+# this temporary branch only, and reads main's Actions cache.
+
+on:
+  push:
+    branches: [export-roc-builds]
+
+permissions: {}
+
+env:
+  SHA: 4b7b1259bfea773aeb909093e604196f3c5a1ac9
+  SHORT: 4b7b125
+
+jobs:
+  unix:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          repository: roc-lang/roc
+          ref: ${{ env.SHA }}
+          path: roc-src
+          sparse-checkout: |
+            LICENSE
+            legal_details
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/cache/restore@v4
+        with:
+          path: .roc-bin
+          key: roc-Linux-X64-${{ env.SHA }}
+          fail-on-cache-miss: true
+      - run: mv .roc-bin linux_x86_64
+
+      - uses: actions/cache/restore@v4
+        with:
+          path: .roc-bin
+          key: roc-Linux-ARM64-${{ env.SHA }}
+          fail-on-cache-miss: true
+      - run: mv .roc-bin linux_arm64
+
+      - uses: actions/cache/restore@v4
+        with:
+          path: .roc-bin
+          key: roc-macOS-X64-${{ env.SHA }}
+          fail-on-cache-miss: true
+      - run: mv .roc-bin macos_x86_64
+
+      - uses: actions/cache/restore@v4
+        with:
+          path: .roc-bin
+          key: roc-macOS-ARM64-${{ env.SHA }}
+          fail-on-cache-miss: true
+      - run: mv .roc-bin macos_apple_silicon
+
+      - name: Package
+        run: |
+          set -euo pipefail
+          mkdir out
+          for name in linux_x86_64 linux_arm64 macos_x86_64 macos_apple_silicon; do
+            folder="roc-$name-$SHORT"
+            mv "$name" "$folder"
+            cp roc-src/LICENSE roc-src/legal_details "$folder"/
+            ls -la "$folder"
+            tar -czf "out/$folder.tar.gz" "$folder"
+          done
+          ./roc-linux_x86_64-$SHORT/roc version
+          sha256sum out/*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: unix
+          path: out/*
+
+  windows:
+    runs-on: windows-2025
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          repository: roc-lang/roc
+          ref: ${{ env.SHA }}
+          path: roc-src
+          sparse-checkout: |
+            LICENSE
+            legal_details
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/cache/restore@v4
+        with:
+          path: .roc-bin
+          key: roc-Windows-X64-${{ env.SHA }}
+          fail-on-cache-miss: true
+
+      - name: Package
+        run: |
+          set -euo pipefail
+          folder="roc-windows_x86_64-$SHORT"
+          mv .roc-bin "$folder"
+          cp roc-src/LICENSE roc-src/legal_details "$folder"/
+          ls -la "$folder"
+          "$folder"/roc.exe version
+          mkdir out
+          7z a -tzip "out/$folder.zip" "$folder"
+          sha256sum out/*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: out/*
