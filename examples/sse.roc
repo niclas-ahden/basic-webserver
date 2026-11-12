@@ -1,7 +1,7 @@
 ## Streams typed SSE events from a retained Roc state machine. The host owns
 ## callback admission, timer scheduling, output framing, and cancellation.
 app [Context, program] {
-	pf: platform "https://github.com/niclas-ahden/basic-webserver/releases/download/0.20.0/8gawVMwxgrwBefBfG9kAMVeJQ68b8kd1tTAAsX1xUtTe.tar.zst",
+	pf: platform "https://github.com/niclas-ahden/basic-webserver/releases/download/0.21.0/3vLPdRC1rDyBD1pYJoS2BN8DQVrYHLStGHdL1P1PdHRg.tar.zst",
 }
 
 import pf.Server
