@@ -188,8 +188,10 @@ jobs:
             os: macos-26-intel
           - id: macos-arm64
             os: roc-mac
-          - id: windows-x64
-            os: windows-2025
+          # WORKAROUND: no windows-x64 builder. On Windows, roc 4b7b125's
+          # compile-time evaluation overflows its stack on examples/datastar
+          # (bf477be was fine). The other builders still cross-build the
+          # x64win binaries, which run on Windows below. Back once roc is fixed.
 
     steps:
       - name: Checkout
