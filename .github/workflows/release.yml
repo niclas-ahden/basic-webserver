@@ -70,7 +70,7 @@ jobs:
     needs: [rust-version, build-windows-host]
     # macOS cross-compiles the Apple and Linux musl hosts. Windows is built
     # natively above because the Rust dependencies require Windows SDK headers.
-    runs-on: macos-15
+    runs-on: roc-mac
     outputs:
       release_version: ${{ steps.validate.outputs.release_version }}
       docs_version: ${{ steps.validate.outputs.docs_version }}
@@ -187,7 +187,7 @@ jobs:
           - id: macos-x64
             os: macos-26-intel
           - id: macos-arm64
-            os: macos-26
+            os: roc-mac
           - id: windows-x64
             os: windows-2025
 
@@ -263,7 +263,7 @@ jobs:
             target: arm64musl
           - os: macos-26-intel
             target: x64mac
-          - os: macos-26
+          - os: roc-mac
             target: arm64mac
           - os: windows-2025
             target: x64win
