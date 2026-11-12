@@ -2,7 +2,7 @@
 ## and seeds.
 app [Context, program] {
 	http: "https://github.com/roc-lang/http/releases/download/1.0.0/6ZUwqYhCS8PU9Mo6MF7oV82ET2o7KYb57CLKDq4cq4sS.tar.zst",
-	pf: platform "https://github.com/niclas-ahden/basic-webserver/releases/download/0.21.0/3vLPdRC1rDyBD1pYJoS2BN8DQVrYHLStGHdL1P1PdHRg.tar.zst",
+	pf: platform "https://github.com/niclas-ahden/basic-webserver/releases/download/0.22.0/7NxsjTDPycgHvrQCAMgmonvf9u4gjpLC9LhEAKZRzA8P.tar.zst",
 }
 
 import pf.Crypt
