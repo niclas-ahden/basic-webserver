@@ -197,6 +197,10 @@ Host := [].{
 	crypt_sha1! : List(U8) => Str
 	crypt_encrypt_aes256_gcm! : List(U8), List(U8), List(U8) => Try({ auth_tag : List(U8), ciphertext : List(U8) }, [CryptoErr(Str)])
 	crypt_decrypt_aes256_gcm! : List(U8), List(U8), List(U8), List(U8) => Try(List(U8), [CryptoErr(Str)])
+	crypt_verify_es256! : List(U8), List(U8), List(U8) => Bool
+	crypt_verify_rs256! : List(U8), List(U8), List(U8), List(U8) => Bool
+	crypt_valid_es256_key! : List(U8) => Bool
+	crypt_valid_rs256_key! : List(U8), List(U8) => Bool
 
 	random_seed_u32! : () => Try(U32, [RandomErr(IOErr)])
 	random_seed_u64! : () => Try(U64, [RandomErr(IOErr)])

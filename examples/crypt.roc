@@ -1,5 +1,5 @@
-## Hashes request bodies, encrypts round trips, and serves random tokens
-## and seeds.
+## Hashes request bodies, encrypts round trips, checks ES256 and RS256
+## signatures, and serves random tokens and seeds.
 app [Context, program] {
 	http: "https://github.com/roc-lang/http/releases/download/1.0.0/6ZUwqYhCS8PU9Mo6MF7oV82ET2o7KYb57CLKDq4cq4sS.tar.zst",
 	pf: platform "https://github.com/niclas-ahden/basic-webserver/releases/download/0.22.0/7NxsjTDPycgHvrQCAMgmonvf9u4gjpLC9LhEAKZRzA8P.tar.zst",
@@ -25,6 +25,7 @@ respond! = |request, _context| {
 			"/encrypt" => encrypt_route!(request)
 			"/token" => token_route!({})
 			"/seed" => seed_route!({})
+			"/verify" => verify_route!({})
 			_ => Ok(text_response(404, "URL Not Found (404)"))
 		}
 
@@ -88,6 +89,74 @@ seed_route! = |{}| {
 	seed = Random.seed_u64!()?
 	Ok(text_response(200, "seed: ${U64.to_str(seed)}"))
 }
+
+## Check an ES256 and an RS256 signature, and the keys ahead of time. A
+## tampered message, a compressed point and a 1024-bit modulus do not pass.
+verify_route! : {} => Try(Response, _)
+verify_route! = |{}| {
+	tampered = Str.to_utf8("webauthn assertion!")
+	ec_key = from_hex(ec_public_key)
+	modulus = from_hex(rsa_modulus)
+	exponent = [1, 0, 1]
+	es256! = |message| Crypt.verify_es256!({ public_key: ec_key, message, signature: from_hex(ec_signature) })
+	rs256! = |message| Crypt.verify_rs256!({ modulus, exponent, message, signature: from_hex(rsa_signature) })
+	lines = [
+		"es256: ${Str.inspect(es256!(signed_message))}",
+		"es256 tampered: ${Str.inspect(es256!(tampered))}",
+		"es256 key: ${Str.inspect(Crypt.valid_es256_key!(ec_key))}",
+		"es256 compressed key: ${Str.inspect(Crypt.valid_es256_key!(from_hex(ec_compressed_public_key)))}",
+		"rs256: ${Str.inspect(rs256!(signed_message))}",
+		"rs256 tampered: ${Str.inspect(rs256!(tampered))}",
+		"rs256 key: ${Str.inspect(Crypt.valid_rs256_key!({ modulus, exponent }))}",
+		"rs256 short key: ${Str.inspect(Crypt.valid_rs256_key!({ modulus: modulus.take_first(128), exponent }))}",
+	]
+	Ok(text_response(200, Str.join_with(lines, "\n")))
+}
+
+## A P-256 key and an RSA-2048 key (exponent 65537), made with openssl, each
+## signing "webauthn assertion" with SHA-256. The P-256 signature has a high
+## S value, which ECDSA signers, WebAuthn authenticators among them, may send.
+signed_message : List(U8)
+signed_message = Str.to_utf8("webauthn assertion")
+
+ec_public_key : Str
+ec_public_key = "04d5c5640a5137d95c6d33c012df7384792091cbacdc9469f605a951bf600349681b446b83438feec51cf466dd845c7138ea859ae8ef4438389ef2a097c145c859"
+
+## The same point compressed, which ES256 checks refuse.
+ec_compressed_public_key : Str
+ec_compressed_public_key = "03d5c5640a5137d95c6d33c012df7384792091cbacdc9469f605a951bf60034968"
+
+ec_signature : Str
+ec_signature = "30460221008f1cc24df1039c0bcd32d8eb10429a7b96c089b06fc41dfa53dcad256a8630a00221008efea3a64ccb959a7cac4a9909780ad900f58d81d15512c271cbc9ba84df4c52"
+
+rsa_modulus : Str
+rsa_modulus = "da312b486e3a81c44d73ac92af9c837dbc21704a2d1cbcd567954e36b67578af9a85a3aac6f776765905885405182141e677f8ed6558a00a443d74109a89ef20ea328d8015d66108dae65f5cd8583b4d23a00010f7152f3cf71d419897cb6ec5efcc992f23674d48d4cff23b7aa5860f4f47b6b00a495faa6167ba5c95b5228078dbcedfee6b629df4ea714d8f16a156b7299306eef953535aaabc4718ba2f543e84b1557b8164ea1035ac598d0bca44da1d276715fcacdb1e784838bb4a7100649b9bcadf1013791eca0f69945cc98320df3161d64af9c4dc81e632c689b858589d2d31fa1bf0225fd308def835638864aacd1ecb56bc675af1bf61ffbe9cfb"
+
+rsa_signature : Str
+rsa_signature = "cbf51b45971caf7436a311392cdbeac65eb0b94a528c4e87c279f5590bd365cc8613df1413e376e778418c166a1d8dee1f38f461cb50a2aea10470628a305ea55825789c426cae9c687fc835f5b126d56ab6e45ac4ae0aeadd84364077777107e1131ebcd37033d3c4e510ba779974feb9bd03cd9ce3caf169fea966241af82ccb05bef6c4e5a1afd04b3876618b5c86cda5069840e44083130e8278808894b3cf7dcd4e719452a7bbecde344611b6a6d7ce7b168e974636d48a230fcba80bf82478701a0efaed77d09ab04dd97965125c59c161fa9e9aa517e0a1ba66fc3f37eab5579db1d29c222157e2f2f7703ac2b307ba7a479dcf4bf6dbf80633b09164"
+
+## Bytes from lowercase hex. A digit that is not hex reads as 0.
+from_hex : Str -> List(U8)
+from_hex = |hex| hex_pairs(Str.to_utf8(hex), 0, [])
+
+hex_pairs : List(U8), U64, List(U8) -> List(U8)
+hex_pairs = |digits, index, acc|
+	if index + 1 >= digits.len() {
+		acc
+	} else {
+		byte = nibble(digits.get(index) ?? 0).shl_wrap(4).bitwise_or(nibble(digits.get(index + 1) ?? 0))
+		hex_pairs(digits, index + 2, acc.append(byte))
+	}
+
+nibble : U8 -> U8
+nibble = |c|
+	if c >= '0' and c <= '9' {
+		c - '0'
+	} else if c >= 'a' and c <= 'f' {
+		c - 'a' + 10
+	} else {
+		0
+	}
 
 text_response : U16, Str -> Response
 text_response = |status, body|

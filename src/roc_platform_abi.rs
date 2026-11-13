@@ -9848,6 +9848,48 @@ pub struct HostCryptSha1Args {
     pub arg0: RocListWith<u8, false>,
 }
 
+/// Arguments for Host.crypt_valid_es256_key!
+/// Roc signature: List(U8) => Bool
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostCryptValidEs256KeyArgs {
+    pub arg0: RocListWith<u8, false>,
+}
+
+/// Arguments for Host.crypt_valid_rs256_key!
+/// Roc signature: List(U8), List(U8) => Bool
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostCryptValidRs256KeyArgs {
+    pub arg0: RocListWith<u8, false>,
+    pub arg1: RocListWith<u8, false>,
+}
+
+/// Arguments for Host.crypt_verify_es256!
+/// Roc signature: List(U8), List(U8), List(U8) => Bool
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostCryptVerifyEs256Args {
+    pub arg0: RocListWith<u8, false>,
+    pub arg1: RocListWith<u8, false>,
+    pub arg2: RocListWith<u8, false>,
+}
+
+/// Arguments for Host.crypt_verify_rs256!
+/// Roc signature: List(U8), List(U8), List(U8), List(U8) => Bool
+/// Refcounted fields are owned by the hosted function.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct HostCryptVerifyRs256Args {
+    pub arg0: RocListWith<u8, false>,
+    pub arg1: RocListWith<u8, false>,
+    pub arg2: RocListWith<u8, false>,
+    pub arg3: RocListWith<u8, false>,
+}
+
 /// Arguments for Host.dir_create!
 /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) } => Try({}, [DirErr(IOErr)])
 /// Refcounted fields are owned by the hosted function.
@@ -15799,6 +15841,40 @@ unsafe extern "C" {
     ///     unsafe { arg0.decref(roc_host); }
     /// The result is owned by Roc: return exactly one owned reference.
     pub fn hosted_crypt_sha1(arg0: RocListWith<u8, false>) -> RocStr;
+
+    /// Hosted symbol for Host.crypt_valid_es256_key!
+    /// Roc signature: List(U8) => Bool
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { arg0.decref(roc_host); }
+    pub fn hosted_crypt_valid_es256_key(arg0: RocListWith<u8, false>) -> bool;
+
+    /// Hosted symbol for Host.crypt_valid_rs256_key!
+    /// Roc signature: List(U8), List(U8) => Bool
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { arg0.decref(roc_host); }
+    ///     unsafe { arg1.decref(roc_host); }
+    pub fn hosted_crypt_valid_rs256_key(arg0: RocListWith<u8, false>, arg1: RocListWith<u8, false>) -> bool;
+
+    /// Hosted symbol for Host.crypt_verify_es256!
+    /// Roc signature: List(U8), List(U8), List(U8) => Bool
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { arg0.decref(roc_host); }
+    ///     unsafe { arg1.decref(roc_host); }
+    ///     unsafe { arg2.decref(roc_host); }
+    pub fn hosted_crypt_verify_es256(arg0: RocListWith<u8, false>, arg1: RocListWith<u8, false>, arg2: RocListWith<u8, false>) -> bool;
+
+    /// Hosted symbol for Host.crypt_verify_rs256!
+    /// Roc signature: List(U8), List(U8), List(U8), List(U8) => Bool
+    /// Owned arguments. Release each exactly once before returning, unless it is
+    /// moved into storage or into the result:
+    ///     unsafe { arg0.decref(roc_host); }
+    ///     unsafe { arg1.decref(roc_host); }
+    ///     unsafe { arg2.decref(roc_host); }
+    ///     unsafe { arg3.decref(roc_host); }
+    pub fn hosted_crypt_verify_rs256(arg0: RocListWith<u8, false>, arg1: RocListWith<u8, false>, arg2: RocListWith<u8, false>, arg3: RocListWith<u8, false>) -> bool;
 
     /// Hosted symbol for Host.dir_create!
     /// Roc signature: { is_windows : Bool, unix_bytes : List(U8), windows_u16s : List(U16) } => Try({}, [DirErr(IOErr)])

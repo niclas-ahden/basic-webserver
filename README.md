@@ -130,6 +130,15 @@ The platform exposes typed modules for:
 - filesystem, environment, path, stdout/stderr, TCP, time, and sleep effects;
 - HTML construction, URL handling, and multipart form parsing.
 
+`Crypt` holds the cryptography Roc's builtin `Crypto` module lacks: SHA-1,
+AES-256-GCM, and ES256 and RS256 signature checks, the algorithms behind
+WebAuthn passkeys and many JWTs and signed webhooks. ES256 takes only
+uncompressed P-256 points and DER signatures, and accepts a high S value.
+RS256 takes moduli of 2048 to 8192 bits, since shorter keys are too weak to
+trust. Each answers whether the signature holds, and `valid_es256_key!` and
+`valid_rs256_key!` check a key by the same rules ahead of time. `Random`
+gives seeds from the operating system.
+
 `UnixTime` provides the POSIX wall-clock effect and normalized timestamps,
 including nanosecond precision and instants before the Unix epoch. Calendar
 systems, time zones, and text formatting are deliberately left to the Roc

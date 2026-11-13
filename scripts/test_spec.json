@@ -1145,6 +1145,11 @@
               "method": "GET",
               "target": "/seed",
               "body_regex": ["^seed: [0-9]+$"]
+            },
+            {
+              "method": "GET",
+              "target": "/verify",
+              "expect_body": "es256: True\nes256 tampered: False\nes256 key: True\nes256 compressed key: False\nrs256: True\nrs256 tampered: False\nrs256 key: True\nrs256 short key: False"
             }
           ]
         }
