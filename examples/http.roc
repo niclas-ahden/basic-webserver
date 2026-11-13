@@ -2,7 +2,7 @@
 ## and response-size limits.
 app [Context, program] {
 	http: "https://github.com/roc-lang/http/releases/download/1.0.0/6ZUwqYhCS8PU9Mo6MF7oV82ET2o7KYb57CLKDq4cq4sS.tar.zst",
-	pf: platform "https://github.com/niclas-ahden/basic-webserver/releases/download/0.22.0/7NxsjTDPycgHvrQCAMgmonvf9u4gjpLC9LhEAKZRzA8P.tar.zst",
+	pf: platform "https://github.com/niclas-ahden/basic-webserver/releases/download/0.23.0/G5qMippV9EatX6FAaAqHcsrRWfVhRRv8tzkKCHZLmTp8.tar.zst",
 }
 
 import pf.Stdout
