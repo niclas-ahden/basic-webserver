@@ -2,7 +2,7 @@
 ## signatures, and serves random tokens and seeds.
 app [Context, program] {
 	http: "https://github.com/roc-lang/http/releases/download/1.0.0/6ZUwqYhCS8PU9Mo6MF7oV82ET2o7KYb57CLKDq4cq4sS.tar.zst",
-	pf: platform "https://github.com/niclas-ahden/basic-webserver/releases/download/0.22.0/7NxsjTDPycgHvrQCAMgmonvf9u4gjpLC9LhEAKZRzA8P.tar.zst",
+	pf: platform "https://github.com/niclas-ahden/basic-webserver/releases/download/0.24.0/AmhZCQsTsZGNyLT6XgN8Z7wqDtCGn22FnSDoqzeF8Z61.tar.zst",
 }
 
 import pf.Crypt
