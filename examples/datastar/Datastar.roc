@@ -1,6 +1,7 @@
 import pf.Sse
 import pf.MultipartFormData
 import pf.Server
+import http.Header
 import http.Response
 
 ## Typed constructors for the Datastar SSE protocol. Applications provide
@@ -257,11 +258,11 @@ signals_from_body! = |request, max_bytes| {
 	}
 }
 
-has_datastar_header : List({ name : Str, value : Str }) -> Bool
+has_datastar_header : List(Header) -> Bool
 has_datastar_header = |headers|
 	match headers {
 		[] => Bool.False
-		[{ name, value }, .. as rest] =>
+		[Header.{ name, value }, .. as rest] =>
 			if ascii_lower(name) == "datastar-request" and ascii_lower(value) == "true" {
 				Bool.True
 			} else {
